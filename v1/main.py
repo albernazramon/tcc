@@ -14,7 +14,7 @@ def analyze_query_patterns(query):
     join_count = len(re.findall(r'\bJOIN\b', query_upper))
     if join_count > 0:
         search_terms.append("JOIN optimization query planning performance")
-        search_terms.append("JJOIN efficiency indexing")
+        search_terms.append("JOIN efficiency indexing")
     
     if re.search(r'\(SELECT', query_upper):
         search_terms.append("subquery optimization")
