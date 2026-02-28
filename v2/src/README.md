@@ -1,6 +1,14 @@
-# API de Otimização de Consultas SQL
+# API de Otimização de Consultas SQL (Arquitetura DDD)
 
 Esta API permite otimizar consultas SQL, sugerindo melhorias com base no esquema do banco de dados e informações adicionais.
+
+## Como executar
+
+Execute a partir da raiz do repositório (TCC):
+
+```bash
+python tcc/v2/src/presentation/api.py
+```
 
 ## Testando a API com o Swagger
 
