@@ -6,8 +6,9 @@ from langchain_ollama import OllamaEmbeddings
 
 EMBEDDING_MODEL = "nomic-embed-text"
 LLM_MODEL = "gemma3"
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "RAG/chroma_db")
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(BASE_DIR, "RAG", "chroma_db")
 
 def analyze_query_patterns(query):
     query_upper = query.upper()
@@ -38,7 +39,7 @@ def analyze_query_patterns(query):
 def retrieve_rag_context(query, k=2):
     try:
         if not os.path.exists(DB_PATH):
-            return "Aviso: Banco de dados RAG não inicializado."
+            return f"Aviso: Banco de dados RAG não inicializado em {DB_PATH}."
 
         search_terms = analyze_query_patterns(query)
         embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
@@ -126,20 +127,3 @@ def optimize_sql_and_generate_insights(query, schemas, additional_info):
     )
 
     return response['message']['content'].strip()
-
-# Testes #
-query = """
-
-"""
-
-schemas = """
-
-"""
-
-additional_info = """
-
-"""
-
-
-result = optimize_sql_and_generate_insights(query, schemas, additional_info)
-print(result)
