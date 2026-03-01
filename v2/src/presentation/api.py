@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Dict, Any
 import uvicorn
 import os
 import sys
@@ -18,6 +19,14 @@ app = FastAPI(
     version="2.0.0"
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DB_PATH = os.path.join(BASE_DIR, "RAG", "chroma_db")
 
@@ -27,20 +36,20 @@ use_case = OptimizeQueryUseCase(retriever=retriever, optimizer=optimizer)
 
 class APIRequest(BaseModel):
     query: str = Field(..., description="A consulta SQL original a ser otimizada")
-    schemas: str = Field(..., description="Os schemas das tabelas envolvidas")
+    schema: str = Field(..., alias="schema", description="Os schemas das tabelas envolvidas")
     additional_info: Optional[str] = Field(None, description="Informações adicionais sobre o ambiente ou dados")
 
 class APIResponse(BaseModel):
     original_query: str
     optimized_query: Optional[str] = None
-    optimized_result: str
+    insights: str
 
 @app.post("/optimize", response_model=APIResponse)
 async def optimize_query(request: APIRequest):
     try:
         domain_request = QueryOptimizationRequest(
             query=request.query,
-            schemas=request.schemas,
+            schemas=request.schema,
             additional_info=request.additional_info
         )
         
@@ -49,7 +58,7 @@ async def optimize_query(request: APIRequest):
         return APIResponse(
             original_query=result.original_query,
             optimized_query=result.optimized_query,
-            optimized_result=result.optimization_explanation
+            insights=result.optimization_explanation
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
