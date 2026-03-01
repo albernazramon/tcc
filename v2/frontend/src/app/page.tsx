@@ -50,7 +50,7 @@ export default function Home() {
             <Database className='w-10 h-10' /> SQL Optimizer
           </h1>
           <p className='text-gray-500 mt-2 text-lg'>
-            Otimize suas consultas PostgreSQL com IA e RAG
+            Otimize suas consultas PostgreSQL
           </p>
         </header>
 

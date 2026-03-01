@@ -44,8 +44,30 @@ class APIResponse(BaseModel):
     optimized_query: Optional[str] = None
     insights: str
 
+import logging
+import time
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler("api_execution.log", encoding="utf-8")
+    ]
+)
+logger = logging.getLogger("SQLOptimizerAPI")
+
 @app.post("/optimize", response_model=APIResponse)
 async def optimize_query(request: APIRequest):
+    logger.info("="*50)
+    logger.info(f"Nova requisição de otimização recebida.")
+    logger.info(f"Tamanho da Consulta Original: {len(request.query)} caracteres")
+    logger.info(f"Tamanho do Schema: {len(request.schema)} caracteres")
+    if request.additional_info:
+        logger.info(f"Informações Adicionais Fornecidas: {len(request.additional_info)} caracteres")
+        
+    start_time = time.time()
+    
     try:
         domain_request = QueryOptimizationRequest(
             query=request.query,
@@ -53,7 +75,15 @@ async def optimize_query(request: APIRequest):
             additional_info=request.additional_info
         )
         
+        logger.info("Iniciando processamento do UseCase de Otimização...")
         result = use_case.execute(domain_request)
+        
+        end_time = time.time()
+        execution_time = round(end_time - start_time, 2)
+        logger.info(f"Otimização concluída com sucesso em {execution_time} segundos.")
+        
+        has_optimized_query = bool(result.optimized_query and result.optimized_query.strip())
+        logger.info(f"Consulta otimizada gerada: {'Sim' if has_optimized_query else 'Não'}")
         
         return APIResponse(
             original_query=result.original_query,
@@ -61,6 +91,8 @@ async def optimize_query(request: APIRequest):
             insights=result.optimization_explanation
         )
     except Exception as e:
+        end_time = time.time()
+        logger.error(f"Erro durante a otimização da consulta: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")
