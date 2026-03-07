@@ -2,7 +2,7 @@ import re
 import os
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
-from tcc.v2.src.domain.interfaces import IVectorRetriever
+from src.domain.interfaces import IVectorRetriever
 
 class ChromaVectorRetriever(IVectorRetriever):
     def __init__(self, db_path: str, embedding_model: str = "nomic-embed-text", k: int = 3):

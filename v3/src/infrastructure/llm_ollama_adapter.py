@@ -1,5 +1,5 @@
 import ollama
-from tcc.v2.src.domain.interfaces import ILLMOptimizer
+from src.domain.interfaces import ILLMOptimizer
 
 class OllamaLLMOptimizer(ILLMOptimizer):
     def __init__(self, model: str = "gemma3"):

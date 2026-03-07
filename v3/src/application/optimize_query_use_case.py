@@ -1,7 +1,7 @@
 import re
 from typing import Optional
-from tcc.v2.src.domain.entities import QueryOptimizationRequest, QueryOptimizationResult
-from tcc.v2.src.domain.interfaces import IVectorRetriever, ILLMOptimizer
+from src.domain.entities import QueryOptimizationRequest, QueryOptimizationResult
+from src.domain.interfaces import IVectorRetriever, ILLMOptimizer
 
 class OptimizeQueryUseCase:
     def __init__(self, retriever: IVectorRetriever, optimizer: ILLMOptimizer):
