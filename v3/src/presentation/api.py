@@ -8,10 +8,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 
-from tcc.v3.src.domain.entities import QueryOptimizationRequest
-from tcc.v3.src.application.optimize_query_use_case import OptimizeQueryUseCase
-from tcc.v3.src.infrastructure.rag_chroma_adapter import ChromaVectorRetriever
-from tcc.v3.src.infrastructure.llm_external_api_adapter import ExternalLLMOptimizer
+from src.domain.entities import QueryOptimizationRequest
+from src.application.optimize_query_use_case import OptimizeQueryUseCase
+from src.infrastructure.rag_chroma_adapter import ChromaVectorRetriever
+from src.infrastructure.llm_external_api_adapter import ExternalLLMOptimizer
 
 app = FastAPI(
     title="SQL Optimizer API (DDD Version)",

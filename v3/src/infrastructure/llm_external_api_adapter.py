@@ -1,5 +1,5 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
-from tcc.v3.src.domain.interfaces import ILLMOptimizer
+from src.domain.interfaces import ILLMOptimizer
 
 class ExternalLLMOptimizer(ILLMOptimizer):
     def __init__(self, api_key: str, model_name: str = "gemini-2.5-flash"):
