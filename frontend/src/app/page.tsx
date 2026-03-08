@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
-import { Loader2, Database, Code, Lightbulb, Key } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Loader2, Database, Code, Lightbulb } from 'lucide-react';
 
 interface OptimizeResponse {
   optimized_query: string;
@@ -15,9 +17,9 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [schema, setSchema] = useState('');
   const [additionalInfo, setAdditionalInfo] = useState('');
-  const [apiKey, setApiKey] = useState('');
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [result, setResult] = useState<OptimizeResponse | null>(null);
+  const { toast } = useToast();
 
   const handleOptimize = async () => {
     if (!query.trim() || !schema.trim()) return;
@@ -28,24 +30,40 @@ export default function Home() {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-      const response = await axios.post(`${apiUrl}/optimize`, {
-        query: query,
-        schema: schema,
-        additional_info: additionalInfo,
-        api_key: apiKey || undefined,
+      const res = await fetch(`${apiUrl}/optimize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query,
+          schema,
+          additional_info: additionalInfo,
+        }),
       });
 
-      setResult(response.data);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || 'Erro ao otimizar a consulta.');
+      }
+
+      const data = await res.json();
+      setResult(data);
+
+      toast({
+        title: 'Sucesso!',
+        description: 'A consulta foi otimizada com sucesso.',
+        variant: 'default',
+      });
     } catch (error: unknown) {
       console.error('Erro ao otimizar consulta:', error);
-      if (axios.isAxiosError(error)) {
-        alert(
-          error.response?.data?.detail ||
-            'Erro ao otimizar a consulta. Verifique o console para mais detalhes.',
-        );
-      } else {
-        alert('Erro inesperado ao otimizar a consulta.');
-      }
+      const errMessage =
+        error instanceof Error
+          ? error.message
+          : 'Erro inesperado. Verifique o console.';
+      toast({
+        title: 'Erro ao otimizar consulta',
+        description: errMessage,
+        variant: 'destructive',
+      });
     } finally {
       setIsOptimizing(false);
     }
@@ -69,9 +87,11 @@ export default function Home() {
               <label className='block text-base font-semibold text-gray-700 mb-2 flex items-center gap-2'>
                 <Code className='w-5 h-5 text-blue-500' /> Consulta SQL Original
               </label>
-              <textarea
+              <Textarea
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setQuery(e.target.value)
+                }
                 placeholder='SELECT * FROM users WHERE...'
                 className='h-full w-full p-4 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none font-mono'
               />
@@ -82,9 +102,11 @@ export default function Home() {
                 <Database className='w-5 h-5 text-blue-500' /> Estrutura do
                 Banco (DDL / Schemas)
               </label>
-              <textarea
+              <Textarea
                 value={schema}
-                onChange={(e) => setSchema(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setSchema(e.target.value)
+                }
                 placeholder='CREATE TABLE users (id INT, name VARCHAR(50));...'
                 className='h-full w-full p-4 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none font-mono'
               />
@@ -95,32 +117,20 @@ export default function Home() {
                 <Lightbulb className='w-5 h-5 text-blue-500' /> Informações
                 Adicionais (Opcional)
               </label>
-              <textarea
+              <Textarea
                 value={additionalInfo}
-                onChange={(e) => setAdditionalInfo(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setAdditionalInfo(e.target.value)
+                }
                 placeholder='Qualquer contexto extra, índice existente ou objetivo específico...'
                 className='h-24 w-full p-4 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none font-sans'
               />
             </div>
 
-            <div className='flex flex-col pt-2 border-t border-gray-100'>
-              <label className='block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2'>
-                <Key className='w-4 h-4 text-orange-500' /> Chave da API
-                (Gemini)
-              </label>
-              <input
-                type='password'
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder='Insira sua Google API Key (Opcional se definida no backend)'
-                className='w-full p-3 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-mono'
-              />
-            </div>
-
-            <button
+            <Button
               onClick={handleOptimize}
               disabled={isOptimizing || !query.trim() || !schema.trim()}
-              className='w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-lg'
+              className='w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-lg'
             >
               {isOptimizing ? (
                 <>
@@ -132,7 +142,7 @@ export default function Home() {
                   <Lightbulb className='w-6 h-6' /> Otimizar Consulta
                 </>
               )}
-            </button>
+            </Button>
           </div>
 
           <div className='bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col min-h-[700px] h-full'>
