@@ -26,7 +26,9 @@ export default function Home() {
     setResult(null);
 
     try {
-      const response = await axios.post('http://localhost:8000/optimize', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+      const response = await axios.post(`${apiUrl}/optimize`, {
         query: query,
         schema: schema,
         additional_info: additionalInfo,
