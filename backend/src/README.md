@@ -20,7 +20,7 @@ Exemplo de payload para o endpoint `/optimize`:
 ```json
 {
   "query": "SELECT * FROM orders WHERE o_orderstatus = 'O' AND o_orderdate > '2024-01-01';",
-  "schemas": "CREATE TABLE orders ( o_orderkey INTEGER PRIMARY KEY, o_custkey INTEGER, o_orderstatus CHAR(1), o_totalprice DECIMAL, o_orderdate DATE );",
+  "schema": "CREATE TABLE orders ( o_orderkey INTEGER PRIMARY KEY, o_custkey INTEGER, o_orderstatus CHAR(1), o_totalprice DECIMAL, o_orderdate DATE );",
   "additional_info": "A tabela 'orders' possui 10 milhões de registros e não possui índices além da chave primária."
 }
 ```
