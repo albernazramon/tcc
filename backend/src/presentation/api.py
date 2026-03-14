@@ -60,13 +60,6 @@ logger = logging.getLogger("SQLOptimizerAPI")
 
 @app.post("/optimize", response_model=APIResponse)
 async def optimize_query(request: APIRequest):
-    logger.info("="*50)
-    logger.info(f"Nova requisição de otimização recebida.")
-    logger.info(f"Tamanho da Consulta Original: {len(request.query)} caracteres")
-    logger.info(f"Tamanho do Schema: {len(request.schema)} caracteres")
-    if request.additional_info:
-        logger.info(f"Informações Adicionais Fornecidas: {len(request.additional_info)} caracteres")
-        
     api_key = os.environ.get("GOOGLE_API_KEY")
     if not api_key:
         raise HTTPException(status_code=400, detail="API Key do Google Gemini é necessária. Forneça no payload ou defina a variável de ambiente GOOGLE_API_KEY.")
@@ -83,15 +76,11 @@ async def optimize_query(request: APIRequest):
         optimizer = ExternalLLMOptimizer(api_key=api_key)
         use_case = OptimizeQueryUseCase(retriever=retriever, optimizer=optimizer)
         
-        logger.info("Iniciando processamento do UseCase de Otimização (API Externa)...")
         result = use_case.execute(domain_request)
         
         end_time = time.time()
         execution_time = round(end_time - start_time, 2)
-        logger.info(f"Otimização concluída com sucesso em {execution_time} segundos.")
-        
         has_optimized_query = bool(result.optimized_query and result.optimized_query.strip())
-        logger.info(f"Consulta otimizada gerada: {'Sim' if has_optimized_query else 'Não'}")
 
         return APIResponse(
             original_query=result.original_query,
@@ -100,7 +89,6 @@ async def optimize_query(request: APIRequest):
         )
     except Exception as e:
         end_time = time.time()
-        logger.error(f"Erro durante a otimização da consulta: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")

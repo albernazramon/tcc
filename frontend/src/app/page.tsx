@@ -54,7 +54,6 @@ export default function Home() {
         variant: 'default',
       });
     } catch (error: unknown) {
-      console.error('Erro ao otimizar consulta:', error);
       const errMessage =
         error instanceof Error
           ? error.message
