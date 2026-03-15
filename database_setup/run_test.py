@@ -1,3 +1,4 @@
+import argparse
 import sys
 import os
 import subprocess
@@ -85,28 +86,31 @@ def run_query_and_collect(query_text, results_dir):
     print(f"  Resultados salvos em: {csv_file}")
     
 def main():
-    if len(sys.argv) < 2:
-        print("Uso: python run_test.py <query_ou_arquivo.sql>")
-        print("Exemplo 1: python run_test.py \"SELECT * FROM minha_tabela;\"")
-        print("Exemplo 2: python run_test.py meu_script.sql")
-        sys.exit(1)
-        
-    arg = sys.argv[1]
+    parser = argparse.ArgumentParser(description="Ferramenta de coleta de metricas para banco de dados TCC.")
+    parser.add_argument("query", help="A string com o comando SQL ou o caminho para o arquivo .sql")
+    parser.add_argument("--reset", action="store_true", help="Reinicia o banco de dados antes da execucao.")
+
+    args = parser.parse_args()
     
     # Verifica se eh um arquivo sql
-    if os.path.isfile(arg):
-        with open(arg, "r", encoding="utf-8") as file:
+    if os.path.isfile(args.query):
+        with open(args.query, "r", encoding="utf-8") as file:
             query_text = file.read()
     else:
-        query_text = arg
+        query_text = args.query
         
     results_dir = "resultados"
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
         
-    restart_database()
-    
-    if wait_for_database():
+    if args.reset:
+        restart_database()
+        db_ready = wait_for_database()
+    else:
+        print_step("O banco de dados NAO sera reiniciado.")
+        db_ready = True
+        
+    if db_ready:
         run_query_and_collect(query_text, results_dir)
 
 if __name__ == "__main__":
