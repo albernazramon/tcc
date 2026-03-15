@@ -1,0 +1,48 @@
+                                                                               QUERY PLAN                                                                               
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Append  (cost=17057.70..224447762.49 rows=11169738974 width=126) (actual time=556.416..3005.094 rows=1947544.00 loops=1)
+   Buffers: shared hit=17373 read=238995 written=7357, temp read=12033 written=5203
+   ->  Merge Join  (cost=17057.70..2947727.91 rows=165887212 width=126) (actual time=556.415..1746.120 rows=1327456.00 loops=1)
+         Merge Cond: (l.l_orderkey = o.o_orderkey)
+         Buffers: shared hit=7457 read=117765 written=6702, temp read=12033 written=5203
+         ->  Index Scan using ix_lineitem_orderkey on lineitem l  (cost=0.43..431303.32 rows=4423659 width=8) (actual time=0.050..671.262 rows=4423653.00 loops=1)
+               Index Searches: 1
+               Buffers: shared hit=7453 read=90947 written=1300
+         ->  Sort  (cost=17057.27..17076.02 rows=7500 width=122) (actual time=308.808..417.832 rows=1702682.00 loops=1)
+               Sort Key: o.o_orderkey
+               Sort Method: external sort  Disk: 20808kB
+               Buffers: shared hit=4 read=26818 written=5402, temp read=8613 written=5203
+               ->  Bitmap Heap Scan on orders o  (cost=86.55..16574.54 rows=7500 width=122) (actual time=21.126..146.900 rows=730707.00 loops=1)
+                     Recheck Cond: ((o_orderstatus)::text = 'F'::text)
+                     Heap Blocks: exact=26200
+                     Buffers: shared read=26818 written=5402
+                     ->  Bitmap Index Scan on ix_orders_orderstatus  (cost=0.00..84.68 rows=7500 width=0) (actual time=18.001..18.002 rows=730707.00 loops=1)
+                           Index Cond: ((o_orderstatus)::text = 'F'::text)
+                           Index Searches: 1
+                           Buffers: shared read=618
+   ->  Merge Join  (cost=0.86..165651339.71 rows=11003851762 width=126) (actual time=0.128..1153.222 rows=620088.00 loops=1)
+         Merge Cond: (l_1.l_orderkey = o_1.o_orderkey)
+         Buffers: shared hit=9916 read=121230 written=655
+         ->  Index Scan using ix_lineitem_orderkey on lineitem l_1  (cost=0.43..442362.46 rows=1474553 width=8) (actual time=0.055..635.538 rows=885484.00 loops=1)
+               Filter: (l_quantity > 40)
+               Rows Removed by Filter: 3538175
+               Index Searches: 1
+               Buffers: shared hit=7472 read=90929 written=498
+         ->  Materialize  (cost=0.43..151245.68 rows=1492500 width=122) (actual time=0.063..346.249 rows=965205.00 loops=1)
+               Storage: Memory  Maximum Storage: 17kB
+               Buffers: shared hit=2444 read=30301 written=157
+               ->  Index Scan using ix_orders_orderkey on orders o_1  (cost=0.43..147514.43 rows=1492500 width=122) (actual time=0.059..258.721 rows=769293.00 loops=1)
+                     Filter: ((o_orderstatus)::text IS DISTINCT FROM 'F'::text)
+                     Rows Removed by Filter: 730707
+                     Index Searches: 1
+                     Buffers: shared hit=2444 read=30301 written=157
+ Planning:
+   Buffers: shared hit=223 read=13 dirtied=3
+ Planning Time: 0.999 ms
+ JIT:
+   Functions: 22
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 1.344 ms (Deform 0.558 ms), Inlining 57.867 ms, Optimization 103.953 ms, Emission 85.764 ms, Total 248.927 ms
+ Execution Time: 3276.480 ms
+(44 rows)
+

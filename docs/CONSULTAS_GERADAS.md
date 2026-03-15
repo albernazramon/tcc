@@ -2,23 +2,6 @@
 
 Este documento contém 6 consultas SQL foram geradas com o modelo gemini-3-flash-preview, com o intuito de ter consultas com problemas de performance.
 
-## Query 1: Join sem índices e filtro ineficiente
-
-**Problema:** Realiza um JOIN entre as duas maiores tabelas do banco sem garantia de índices nas chaves estrangeiras (se não criados) e usa um filtro `OR` que pode forçar um Sequential Scan.
-
-```sql
-SELECT
-    o.o_orderkey,
-    o.o_orderdate,
-    l.l_extendedprice
-FROM
-    public.orders o
-JOIN
-    public.lineitem l ON o.o_orderkey = l.l_orderkey
-WHERE
-    o.o_orderstatus = 'F' OR l.l_quantity > 40;
-```
-
 ## Query 2: Uso de funções em colunas no WHERE (SARGability)
 
 **Problema:** O uso de `UPPER()` na coluna `c_name` impede o uso de índices B-tree padrão, resultando em um Full Table Scan na tabela `customer`.

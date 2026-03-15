@@ -1,0 +1,32 @@
+                                                                 QUERY PLAN                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------
+ Merge Join  (cost=279133.51..17927093.59 rows=297023601 width=126) (actual time=3380.950..4735.631 rows=1947544.00 loops=1)
+   Merge Cond: (o.o_orderkey = l.l_orderkey)
+   Join Filter: (((o.o_orderstatus)::text = 'F'::text) OR (l.l_quantity > 40))
+   Rows Removed by Join Filter: 2476115
+   Buffers: shared hit=4 read=110384 dirtied=110366 written=92452, temp read=33731 written=33816
+   ->  Sort  (cost=111506.96..112161.96 rows=262000 width=240) (actual time=944.857..1039.246 rows=1500000.00 loops=1)
+         Sort Key: o.o_orderkey
+         Sort Method: external merge  Disk: 39696kB
+         Buffers: shared hit=4 read=26200 dirtied=26200 written=9729, temp read=9917 written=9940
+         ->  Seq Scan on orders o  (cost=0.00..28820.00 rows=262000 width=240) (actual time=179.256..629.434 rows=1500000.00 loops=1)
+               Buffers: shared read=26200 dirtied=26200 written=9729
+   ->  Materialize  (cost=167626.55..170993.91 rows=673472 width=12) (actual time=2435.993..3117.479 rows=4423659.00 loops=1)
+         Storage: Memory  Maximum Storage: 17kB
+         Buffers: shared read=84184 dirtied=84166 written=82723, temp read=23814 written=23876
+         ->  Sort  (cost=167626.55..169310.23 rows=673472 width=12) (actual time=2435.985..2719.268 rows=4423659.00 loops=1)
+               Sort Key: l.l_orderkey
+               Sort Method: external merge  Disk: 95256kB
+               Buffers: shared read=84184 dirtied=84166 written=82723, temp read=23814 written=23876
+               ->  Seq Scan on lineitem l  (cost=0.00..90918.72 rows=673472 width=12) (actual time=0.214..1573.966 rows=4423659.00 loops=1)
+                     Buffers: shared read=84184 dirtied=84166 written=82723
+ Planning:
+   Buffers: shared hit=152 read=25
+ Planning Time: 0.544 ms
+ JIT:
+   Functions: 14
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 0.841 ms (Deform 0.281 ms), Inlining 55.653 ms, Optimization 67.719 ms, Emission 55.796 ms, Total 180.008 ms
+ Execution Time: 4992.034 ms
+(28 rows)
+
