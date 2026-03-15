@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  postgres-test:
+    image: postgres:18.1
+    container_name: tcc-postgres-retails
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: retails
+    ports:
+      - '5432:5432'
+    volumes:
+      - ../../baks/banco_postgres_original.sql:/tmp/banco_postgres_original.sql
+      - ./init-db.sh:/docker-entrypoint-initdb.d/01_init-db.sh
