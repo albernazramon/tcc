@@ -1,11 +1,11 @@
 import re
 import os
 from langchain_chroma import Chroma
-from langchain_ollama import OllamaEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from src.domain.interfaces import IVectorRetriever
 
 class ChromaVectorRetriever(IVectorRetriever):
-    def __init__(self, db_path: str, embedding_model: str = "nomic-embed-text", k: int = 3):
+    def __init__(self, db_path: str, embedding_model: str = "models/text-embedding-004", k: int = 3):
         self.db_path = db_path
         self.embedding_model = embedding_model
         self.k = k
@@ -44,7 +44,7 @@ class ChromaVectorRetriever(IVectorRetriever):
             search_terms = self._analyze_query_patterns(query)
             
             try:
-                embeddings = OllamaEmbeddings(model=self.embedding_model)
+                embeddings = GoogleGenerativeAIEmbeddings(model=self.embedding_model)
                 vectorstore = Chroma(persist_directory=self.db_path, embedding_function=embeddings)
             except KeyError as e:                
                 import traceback
@@ -74,4 +74,7 @@ class ChromaVectorRetriever(IVectorRetriever):
         
         except Exception as e:
             print(f"Erro ao acessar RAG: {e}")
-            raise ConnectionError(f"Erro ao recuperar contexto do RAG: {str(e)}")
+            error_str = str(e)
+            if "Failed to connect to Ollama" in error_str:
+                raise ConnectionError("RAG Inativo: O serviço local do Ollama não está rodando ou não está acessível no servidor de produção. Certifique-se de que o modelo de embeddings (ex. nomic-embed-text) esteja disponível.")
+            raise ConnectionError(f"Erro ao recuperar contexto do RAG: {error_str}")

@@ -1,0 +1,12 @@
+                                                 QUERY PLAN                                                  
+-------------------------------------------------------------------------------------------------------------
+ Seq Scan on customer  (cost=0.00..4066.40 rows=177 width=122) (actual time=0.217..89.864 rows=1.00 loops=1)
+   Filter: (upper((c_name)::text) ~~ 'CUSTOMER#000000001%'::text)
+   Rows Removed by Filter: 149999
+   Buffers: shared read=3536 dirtied=3518
+ Planning:
+   Buffers: shared hit=34 read=8
+ Planning Time: 0.442 ms
+ Execution Time: 89.930 ms
+(8 rows)
+

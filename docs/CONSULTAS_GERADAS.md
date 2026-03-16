@@ -1,21 +1,5 @@
 # Consultas
 
-Este documento contém 6 consultas SQL foram geradas com o modelo gemini-3-flash-preview, com o intuito de ter consultas com problemas de performance.
-
-## Query 2: Uso de funções em colunas no WHERE (SARGability)
-
-**Problema:** O uso de `UPPER()` na coluna `c_name` impede o uso de índices B-tree padrão, resultando em um Full Table Scan na tabela `customer`.
-
-```sql
-SELECT
-    c_name,
-    c_acctbal
-FROM
-    public.customer
-WHERE
-    UPPER(c_name) LIKE 'CUSTOMER#000000001%';
-```
-
 ## Query 3: Subconsulta correlacionada pesada
 
 **Problema:** A subconsulta é executada para cada linha da tabela `part`, o que é extremamente ineficiente para grandes volumes. Deveria ser um JOIN com agregação.
