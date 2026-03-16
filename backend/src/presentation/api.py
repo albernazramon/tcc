@@ -31,7 +31,7 @@ app.add_middleware(
 )
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DB_PATH = os.path.join(BASE_DIR, "RAG", "chroma_db")
+DB_PATH = os.environ.get("CHROMA_DB_PATH", os.path.join(BASE_DIR, "RAG", "chroma_db"))
 
 retriever = ChromaVectorRetriever(db_path=DB_PATH)
 
@@ -96,7 +96,16 @@ async def optimize_query(request: APIRequest):
 
 @app.get("/")
 async def root():
-    return {"message": "SQL Optimizer API (DDD) is running. Access /docs for documentation."}
+    import glob
+    search_path = os.path.join(BASE_DIR, "**", "chroma.sqlite3")
+    found_dbs = glob.glob(search_path, recursive=True)
+    return {
+        "message": "SQL Optimizer API (DDD) is running. Access /docs for documentation.",
+        "base_dir": BASE_DIR,
+        "default_db_path": DB_PATH,
+        "db_exists": os.path.exists(DB_PATH),
+        "found_dbs": found_dbs
+    }
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
