@@ -39,7 +39,7 @@ class ChromaVectorRetriever(IVectorRetriever):
     def retrieve_context(self, query: str) -> str:
         try:
             if not os.path.exists(self.db_path):
-                return f"Aviso: Banco de dados RAG não inicializado em {self.db_path}."
+                raise ConnectionError(f"Banco de dados RAG não inicializado em {self.db_path}.")
 
             search_terms = self._analyze_query_patterns(query)
             embeddings = OllamaEmbeddings(model=self.embedding_model)
@@ -68,4 +68,4 @@ class ChromaVectorRetriever(IVectorRetriever):
         
         except Exception as e:
             print(f"Erro ao acessar RAG: {e}")
-            return "Erro ao recuperar contexto do RAG."
+            raise ConnectionError(f"Erro ao recuperar contexto do RAG: {str(e)}")

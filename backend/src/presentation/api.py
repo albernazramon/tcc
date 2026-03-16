@@ -87,6 +87,9 @@ async def optimize_query(request: APIRequest):
             optimized_query=result.optimized_query,
             insights=result.optimization_explanation
         )
+    except ConnectionError as e:
+        end_time = time.time()
+        raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
         end_time = time.time()
         raise HTTPException(status_code=500, detail=str(e))
