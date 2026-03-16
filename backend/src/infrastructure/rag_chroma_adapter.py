@@ -42,8 +42,14 @@ class ChromaVectorRetriever(IVectorRetriever):
                 raise ConnectionError(f"Banco de dados RAG não inicializado em {self.db_path}.")
 
             search_terms = self._analyze_query_patterns(query)
-            embeddings = OllamaEmbeddings(model=self.embedding_model)
-            vectorstore = Chroma(persist_directory=self.db_path, embedding_function=embeddings)
+            
+            try:
+                embeddings = OllamaEmbeddings(model=self.embedding_model)
+                vectorstore = Chroma(persist_directory=self.db_path, embedding_function=embeddings)
+            except KeyError as e:                
+                import traceback
+                print(f"Erro de configuração do Chroma/Embeddings: {traceback.format_exc()}")
+                raise ConnectionError(f"Incompatibilidade no banco RAG local com a versão do pacote ou modelo (Erro: {e}). O RAG não pôde ser ativado.")
             
             all_results = []
             seen_content = set()
