@@ -1,11 +1,11 @@
 import re
 import os
 from langchain_chroma import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from src.domain.interfaces import IVectorRetriever
 
 class ChromaVectorRetriever(IVectorRetriever):
-    def __init__(self, db_path: str, embedding_model: str = "models/text-embedding-004", k: int = 3):
+    def __init__(self, db_path: str, embedding_model: str = "nomic-embed-text", k: int = 3):
         self.db_path = db_path
         self.embedding_model = embedding_model
         self.k = k
@@ -44,15 +44,17 @@ class ChromaVectorRetriever(IVectorRetriever):
             search_terms = self._analyze_query_patterns(query)
             
             try:
-                embeddings = GoogleGenerativeAIEmbeddings(model=self.embedding_model)
+                embeddings = OllamaEmbeddings(model=self.embedding_model)
                 vectorstore = Chroma(persist_directory=self.db_path, embedding_function=embeddings)
-            except KeyError as e:                
+            except Exception as e:                
                 import traceback
                 print(f"Erro de configuração do Chroma/Embeddings: {traceback.format_exc()}")
                 raise ConnectionError(f"Incompatibilidade no banco RAG local com a versão do pacote ou modelo (Erro: {e}). O RAG não pôde ser ativado.")
             
             all_results = []
             seen_content = set()
+            
+            print(f"Buscando contexto no RAG para os termos: {search_terms}")
             
             for term in search_terms:
                 results = vectorstore.similarity_search(term, k=self.k)
@@ -61,6 +63,8 @@ class ChromaVectorRetriever(IVectorRetriever):
                     if content_hash not in seen_content:
                         all_results.append(doc)
                         seen_content.add(content_hash)
+            
+            print(f"RAG: {len(all_results)} trechos relevantes encontrados.")
             
             if not all_results:
                 return "Nenhum contexto relevante encontrado no RAG."
