@@ -6,3 +6,6 @@ chromadb==1.4.1
 langchain-chroma==1.1.0
 langchain-ollama==1.0.1
 ollama==0.6.1
+pinecone-client==5.0.1
+langchain-pinecone==0.2.0
+python-dotenv==1.0.1

@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirna
 
 from src.domain.entities import QueryOptimizationRequest
 from src.application.optimize_query_use_case import OptimizeQueryUseCase
-from src.infrastructure.rag_chroma_adapter import ChromaVectorRetriever
+from src.infrastructure.rag_pinecone_adapter import PineconeVectorRetriever
 from src.infrastructure.llm_external_api_adapter import ExternalLLMOptimizer
 
 app = FastAPI(
@@ -31,9 +31,21 @@ app.add_middleware(
 )
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DB_PATH = os.path.abspath(os.path.join(BASE_DIR, "RAG", "chroma_db"))
+PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
+PINECONE_INDEX_NAME = os.environ.get("PINECONE_INDEX_NAME")
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
-retriever = ChromaVectorRetriever(db_path=DB_PATH)
+retriever = None
+if PINECONE_API_KEY and PINECONE_INDEX_NAME and GOOGLE_API_KEY:
+    try:
+        retriever = PineconeVectorRetriever(
+            index_name=PINECONE_INDEX_NAME,
+            google_api_key=GOOGLE_API_KEY,
+            pinecone_api_key=PINECONE_API_KEY
+        )
+        print("RAG inicializado com sucesso usando Pinecone.")
+    except Exception as e:
+        print(f"Erro ao inicializar Pinecone: {e}")
 
 class APIRequest(BaseModel):
     query: str = Field(..., description="A consulta SQL original a ser otimizada")
@@ -96,15 +108,11 @@ async def optimize_query(request: APIRequest):
 
 @app.get("/")
 async def root():
-    import glob
-    search_path = os.path.join(BASE_DIR, "**", "chroma.sqlite3")
-    found_dbs = glob.glob(search_path, recursive=True)
     return {
         "message": "SQL Optimizer API (DDD) is running. Access /docs for documentation.",
         "base_dir": BASE_DIR,
-        "default_db_path": DB_PATH,
-        "db_exists": os.path.exists(DB_PATH),
-        "found_dbs": found_dbs
+        "rag_status": "Active" if retriever else "Inactive (Check environment variables)",
+        "pinecone_index": PINECONE_INDEX_NAME
     }
 
 if __name__ == "__main__":
