@@ -12,3 +12,4 @@ class QueryOptimizationResult:
     original_query: str
     optimized_query: Optional[str]
     optimization_explanation: str
+    manual_references: list[dict] = None

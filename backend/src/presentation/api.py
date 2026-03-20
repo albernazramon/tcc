@@ -56,6 +56,7 @@ class APIResponse(BaseModel):
     original_query: str
     optimized_query: Optional[str] = None
     insights: str
+    manual_references: Optional[list[dict]] = None
 
 import logging
 import time
@@ -97,7 +98,8 @@ async def optimize_query(request: APIRequest):
         return APIResponse(
             original_query=result.original_query,
             optimized_query=result.optimized_query,
-            insights=result.optimization_explanation
+            insights=result.optimization_explanation,
+            manual_references=result.manual_references
         )
     except ConnectionError as e:
         end_time = time.time()

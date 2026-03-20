@@ -39,9 +39,10 @@ class ExternalLLMOptimizer(ILLMOptimizer):
            - Use as informações do MANUAL fornecidas para validar sua análise.
 
         2. CONSULTA OTIMIZADA:
-           - Forneça o código SQL reescrito para máxima performance.
+           - Forneça APENAS o código SQL reescrito para máxima performance dentro do bloco de código.
+           - NÃO inclua comentários de sugestão de índices dentro do bloco SQL.
            - Mantenha a semântica original dos dados.
-           - Se necessário, sugira a criação de índices (comentados no código).
+           - Se houver necessidade de índices, mencione-os APENAS na seção 3 (EXPLICAÇÃO TÉCNICA).
 
         3. EXPLICAÇÃO TÉCNICA E PLANO DE EXECUÇÃO ESTIMADO:
            - Explique as mudanças feitas.

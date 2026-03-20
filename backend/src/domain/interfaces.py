@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class IVectorRetriever(ABC):
     @abstractmethod
-    def retrieve_context(self, query: str) -> str:
+    def retrieve_context(self, query: str) -> tuple[str, list[dict]]:
         pass
 
 class ILLMOptimizer(ABC):

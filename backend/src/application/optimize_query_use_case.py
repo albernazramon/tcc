@@ -16,7 +16,7 @@ class OptimizeQueryUseCase:
         return None
 
     def execute(self, request: QueryOptimizationRequest) -> QueryOptimizationResult:
-        context = self.retriever.retrieve_context(request.query)
+        context, references = self.retriever.retrieve_context(request.query)
         
         llm_response = self.optimizer.generate_optimization(
             query=request.query,
@@ -30,5 +30,6 @@ class OptimizeQueryUseCase:
         return QueryOptimizationResult(
             original_query=request.query,
             optimized_query=extracted_query,
-            optimization_explanation=llm_response
+            optimization_explanation=llm_response,
+            manual_references=references
         )

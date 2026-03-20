@@ -36,7 +36,7 @@ class ChromaVectorRetriever(IVectorRetriever):
         
         return list(set(search_terms))
 
-    def retrieve_context(self, query: str) -> str:
+    def retrieve_context(self, query: str) -> tuple[str, list[dict]]:
         try:
             if not os.path.exists(self.db_path):
                 raise ConnectionError(f"Banco de dados RAG não inicializado em {self.db_path}.")
@@ -66,15 +66,21 @@ class ChromaVectorRetriever(IVectorRetriever):
             
             print(f"RAG: {len(all_results)} trechos relevantes encontrados.")
             
+            references = []
             if not all_results:
-                return "Nenhum contexto relevante encontrado no RAG."
+                return "Nenhum contexto relevante encontrado no RAG.", []
             
             context = "### CONTEXTO DO MANUAL POSTGRESQL\n"
             for i, doc in enumerate(all_results):
                 page = doc.metadata.get('page', '?')
                 context += f"\n--- Trecho {i+1} (Manual pág. {page}) ---\n{doc.page_content.strip()}\n"
+                references.append({
+                    "id": i + 1,
+                    "page": page,
+                    "content": doc.page_content.strip()
+                })
             
-            return context
+            return context, references
         
         except Exception as e:
             print(f"Erro ao acessar RAG: {e}")
