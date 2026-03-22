@@ -16,32 +16,33 @@ WHERE
     UPPER(c_name) LIKE 'CUSTOMER#000000001%';
 ```
 
-### Pós-Otimização: TODO
+### Pós-Otimização: Criação de índices
 
-**Alterações:** TODO
+**Alterações:** O modelo manteve a consulta sintaticamente intacta, porém indicou a criação dos seguintes índices para tornar a função UPPER(c_name) sargeável.
 
 ```sql
-
+CREATE INDEX idx_customer_c_name_upper ON public.customer (UPPER(c_name) varchar_pattern_ops);
 ```
 
 ---
 
 ## Comparação de Desempenho
 
-| Métrica                    | Pré-Otimização | Pós-Otimização | Diferença / Impacto |
-| :------------------------- | :------------- | :------------- | :------------------ |
-| **Tempo de Execução**      | 89.930 ms      |                |                     |
-| **Custo Inicial Estimado** | 0.00           |                |                     |
-| **Custo Total Estimado**   | 4066.40        |                |                     |
-| **Memória: Hit**           | -              |                |                     |
-| **Memória: Read**          | 3536           |                |                     |
-| **Memória: Dirtied**       | 3518           |                |                     |
-| **Memória: Written**       | -              |                |                     |
-| **Temp Read**              | -              |                |                     |
-| **Temp Written**           | -              |                |                     |
+| Métrica                    | Pré-Otimização | Pós-Otimização | Diferença / Impacto   |
+| :------------------------- | :------------- | :------------- | :-------------------- |
+| **Tempo de Execução**      | 89.930 ms      | 0.759 ms       | Redução drástica      |
+| **Custo Inicial Estimado** | 0.00           | 24.11          | Aumento baixo         |
+| **Custo Total Estimado**   | 4,066.40       | 1,858.73       | Redução impactante    |
+| **Linhas**                 | 177            | 750            | Aumento significativo |
+| **Memória: Hit**           | -              | 1              | -                     |
+| **Memória: Read**          | 3,536          | 3              | Redução drástica      |
+| **Memória: Dirtied**       | 3,518          | -              | Nenhuma memória suja  |
+| **Memória: Written**       | -              | -              | -                     |
+| **Temp Read**              | -              | -              | -                     |
+| **Temp Written**           | -              | -              | -                     |
 
 ### Resultados da Consulta (Registros)
 
 - **Pré-Otimização:** [resultado_pre_otimizacao](.\resultado_pre_otimizacao.csv)
 - **Pós-Otimização:** [resultado_pos_otimizacao](.\resultado_pos_otimizacao.csv)
-  _(Os resultados apresentam a mesma quantidade de linhas, porém os dados não estão ordenados da mesma forma que no resultado da consulta original, devido à mudança de plano de execução com o `UNION ALL`.)_
+  \_(Os resultados apresentam os mesmos valores)

@@ -1,0 +1,16 @@
+                                                              QUERY PLAN                                                                
+------------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on customer  (cost=24.11..1858.73 rows=750 width=23) (actual time=0.317..0.318 rows=1.00 loops=1)
+   Filter: (upper((c_name)::text) ~~ 'CUSTOMER#000000001%'::text)
+   Heap Blocks: exact=1
+   Buffers: shared hit=1 read=3
+   ->  Bitmap Index Scan on idx_customer_c_name_upper  (cost=0.00..23.92 rows=750 width=0) (actual time=0.029..0.029 rows=1.00 loops=1)
+         Index Cond: ((upper((c_name)::text) ~>=~ 'CUSTOMER#000000001'::text) AND (upper((c_name)::text) ~<~ 'CUSTOMER#000000002'::text))
+         Index Searches: 1
+         Buffers: shared read=3
+ Planning:
+   Buffers: shared hit=85 read=5 dirtied=1
+ Planning Time: 2.253 ms
+ Execution Time: 0.759 ms
+(12 rows)
+
