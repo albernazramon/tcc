@@ -50,7 +50,7 @@ class ExternalLLMOptimizer(ILLMOptimizer):
            - Forneça recomendações de manutenção (VACUUM, ANALYZE).
 
         ### REGRAS CRÍTICAS
-        - Responda em PORTUGUÊS.
+        - Responda em PORTUGUÊS. Todas as citações, referências e explicações baseadas no MANUAL (RAG) que estiverem em outros idiomas DEVEM ser traduzidas para o Português do Brasil de forma clara e técnica.
         - Seja extremamente técnico e preciso.
         - Se a consulta for ineficiente devido à estrutura (ex: falta de índices), forneça o comando `CREATE INDEX`.
         - Utilize o contexto do MANUAL sempre que possível para embasar sua decisão.
