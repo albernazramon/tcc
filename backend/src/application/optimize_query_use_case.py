@@ -9,10 +9,17 @@ class OptimizeQueryUseCase:
         self.optimizer = optimizer
 
     def _extract_sql_query(self, markdown_text: str) -> Optional[str]:
-        pattern = r"```sql\n(.*?)\n```"
-        match = re.search(pattern, markdown_text, re.DOTALL | re.IGNORECASE)
+        pattern_section = r"(?:2\.|#)\s*(?:CONSULTA OTIMIZADA|OPTIMIZED QUERY).*?```sql\n(.*?)\n```"
+        match = re.search(pattern_section, markdown_text, re.DOTALL | re.IGNORECASE)
+        
         if match:
             return match.group(1).strip()
+        
+        pattern_fallback = r"```sql\n(.*?)\n```"
+        matches = re.findall(pattern_fallback, markdown_text, re.DOTALL | re.IGNORECASE)
+        if matches:
+            return matches[-1].strip()
+            
         return None
 
     def execute(self, request: QueryOptimizationRequest) -> QueryOptimizationResult:
