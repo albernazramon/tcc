@@ -36,7 +36,8 @@ class ExternalLLMOptimizer(ILLMOptimizer):
         1. ANÁLISE DE PROBLEMAS:
            - Identifique por que a consulta original é lenta.
            - Cite conceitos como SARGability, tipos de Joins, ou custo de ordenação se aplicável.
-           - Use as informações do MANUAL fornecidas para validar sua análise.
+           - Use as informações do MANUAL fornecidas para validar sua análise. 
+           - AO CITAR O MANUAL: Não repita o conteúdo bruto (trechos) do manual na resposta. Em vez disso, mencione apenas o número da página correspondente como referência (ex: "Conforme o manual do PostgreSQL (pág. 42)...").
 
         2. CONSULTA OTIMIZADA:
            - Forneça APENAS o código SQL reescrito para máxima performance dentro do bloco de código.
@@ -51,6 +52,7 @@ class ExternalLLMOptimizer(ILLMOptimizer):
 
         ### REGRAS CRÍTICAS
         - Responda em PORTUGUÊS. Todas as citações, referências e explicações baseadas no MANUAL (RAG) que estiverem em outros idiomas DEVEM ser traduzidas para o Português do Brasil de forma clara e técnica.
+        - REFERÊNCIAS AO MANUAL: Nunca exiba o conteúdo bruto dos trechos do MANUAL na sua resposta. Utilize apenas o número da página para referenciar o conhecimento aplicado.
         - Seja extremamente técnico e preciso.
         - Se a consulta for ineficiente devido à estrutura (ex: falta de índices), forneça o comando `CREATE INDEX`.
         - Utilize o contexto do MANUAL sempre que possível para embasar sua decisão.
