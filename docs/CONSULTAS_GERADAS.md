@@ -1,37 +1,5 @@
 # Consultas
 
-## Query 3: Subconsulta correlacionada pesada
-
-**Problema:** A subconsulta é executada para cada linha da tabela `part`, o que é extremamente ineficiente para grandes volumes. Deveria ser um JOIN com agregação.
-
-```sql
-SELECT
-    p.p_name,
-    (SELECT SUM(l.l_quantity)
-     FROM public.lineitem l
-     WHERE l.l_partkey = p.p_partkey) as total_qty
-FROM
-    public.part p
-WHERE
-    p.p_size > 10;
-```
-
-## Query 4: Ordenação global de grande volume sem índice
-
-**Problema:** Ordenar 4.4 milhões de registros por uma coluna não indexada causará um Sort em disco extremamente lento.
-
-```sql
-SELECT
-    l_orderkey,
-    l_partkey,
-    l_shipdate
-FROM
-    public.lineitem
-ORDER BY
-    l_shipdate DESC
-LIMIT 100;
-```
-
 ## Query 5: Filtro LIKE com wildcard no início
 
 **Problema:** O uso de `%` no início da string de busca impossibilita o uso de índices padrão, forçando a leitura de toda a tabela `supplier`.

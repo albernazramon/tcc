@@ -1,0 +1,13 @@
+                                                                          QUERY PLAN                                                                          
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.43..9.90 rows=100 width=19) (actual time=0.071..0.688 rows=100.00 loops=1)
+   Buffers: shared hit=13 read=87
+   ->  Index Scan using idx_lineitem_l_shipdate_desc on lineitem  (cost=0.43..418728.67 rows=4423423 width=19) (actual time=0.070..0.680 rows=100.00 loops=1)
+         Index Searches: 1
+         Buffers: shared hit=13 read=87
+ Planning:
+   Buffers: shared hit=70 read=4
+ Planning Time: 0.510 ms
+ Execution Time: 0.722 ms
+(9 rows)
+

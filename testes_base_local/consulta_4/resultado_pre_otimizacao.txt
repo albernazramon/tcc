@@ -1,0 +1,22 @@
+                                                                     QUERY PLAN                                                                     
+----------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=98714.98..98726.63 rows=100 width=126) (actual time=1377.273..1387.458 rows=100.00 loops=1)
+   Buffers: shared hit=76 read=84184 dirtied=84166 written=66641
+   ->  Gather Merge  (cost=98714.98..177151.78 rows=673471 width=126) (actual time=1377.271..1387.449 rows=100.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=76 read=84184 dirtied=84166 written=66641
+         ->  Sort  (cost=97714.96..98416.49 rows=280613 width=126) (actual time=1374.768..1374.771 rows=75.67 loops=3)
+               Sort Key: l_shipdate DESC
+               Sort Method: top-N heapsort  Memory: 35kB
+               Buffers: shared hit=76 read=84184 dirtied=84166 written=66641
+               Worker 0:  Sort Method: top-N heapsort  Memory: 36kB
+               Worker 1:  Sort Method: top-N heapsort  Memory: 36kB
+               ->  Parallel Seq Scan on lineitem  (cost=0.00..86990.13 rows=280613 width=126) (actual time=0.123..1121.102 rows=1474553.00 loops=3)
+                     Buffers: shared read=84184 dirtied=84166 written=66641
+ Planning:
+   Buffers: shared hit=52 read=17
+ Planning Time: 0.348 ms
+ Execution Time: 1387.505 ms
+(18 rows)
+
