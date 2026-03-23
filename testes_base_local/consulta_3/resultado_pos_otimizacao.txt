@@ -1,0 +1,43 @@
+                                                                           QUERY PLAN                                                                            
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=13683436.73..13689480.38 rows=19653 width=130) (actual time=1494.842..1643.106 rows=159947.00 loops=1)
+   Group Key: p.p_partkey, p.p_name
+   Buffers: shared hit=12158 read=75792, temp read=21760 written=35820
+   ->  Gather Merge  (cost=13683436.73..13688930.10 rows=47167 width=130) (actual time=1494.802..1595.760 rows=479558.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=12158 read=75792, temp read=21760 written=35820
+         ->  Sort  (cost=13682436.70..13682485.83 rows=19653 width=130) (actual time=1475.132..1490.148 rows=159852.67 loops=3)
+               Sort Key: p.p_partkey, p.p_name
+               Sort Method: external merge  Disk: 9288kB
+               Buffers: shared hit=12158 read=75792, temp read=21760 written=35820
+               Worker 0:  Sort Method: external merge  Disk: 9280kB
+               Worker 1:  Sort Method: external merge  Disk: 9280kB
+               ->  Partial HashAggregate  (cost=13680838.67..13681035.20 rows=19653 width=130) (actual time=1248.386..1414.852 rows=159852.67 loops=3)
+                     Group Key: p.p_partkey, p.p_name
+                     Batches: 5  Memory Usage: 4665kB  Disk Usage: 48704kB
+                     Buffers: shared hit=12128 read=75792, temp read=18279 written=32330
+                     Worker 0:  Batches: 5  Memory Usage: 4665kB  Disk Usage: 49968kB
+                     Worker 1:  Batches: 5  Memory Usage: 4665kB  Disk Usage: 50952kB
+                     ->  Parallel Hash Join  (cost=5124.89..9072837.51 rows=614400155 width=126) (actual time=276.485..836.287 rows=1178954.00 loops=3)
+                           Hash Cond: (l.l_partkey = p.p_partkey)
+                           Buffers: shared hit=12128 read=75792
+                           ->  Parallel Seq Scan on lineitem l  (cost=0.00..102615.91 rows=1843191 width=8) (actual time=0.104..132.178 rows=1474553.00 loops=3)
+                                 Buffers: shared hit=12128 read=72056
+                           ->  Parallel Hash  (cost=4777.67..4777.67 rows=27778 width=122) (actual time=275.892..275.893 rows=53315.67 loops=3)
+                                 Buckets: 262144 (originally 131072)  Batches: 1 (originally 1)  Memory Usage: 14592kB
+                                 Buffers: shared read=3736
+                                 ->  Parallel Seq Scan on part p  (cost=0.00..4777.67 rows=27778 width=122) (actual time=250.169..258.906 rows=53315.67 loops=3)
+                                       Filter: (p_size > 10)
+                                       Rows Removed by Filter: 13351
+                                       Buffers: shared read=3736
+ Planning:
+   Buffers: shared hit=110 read=32 dirtied=2
+ Planning Time: 0.778 ms
+ JIT:
+   Functions: 72
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 4.658 ms (Deform 1.939 ms), Inlining 194.545 ms, Optimization 353.597 ms, Emission 269.993 ms, Total 822.794 ms
+ Execution Time: 1853.337 ms
+(39 rows)
+
