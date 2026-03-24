@@ -1,0 +1,28 @@
+                                                                         QUERY PLAN                                                                         
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Unique  (cost=56545.38..56565.03 rows=2620 width=122) (actual time=683.698..873.614 rows=884532.00 loops=1)
+   Buffers: shared hit=26019 read=26376 dirtied=26200 written=10021, temp read=2941 written=2955
+   ->  Sort  (cost=56545.38..56551.93 rows=2620 width=122) (actual time=683.697..749.579 rows=1030392.00 loops=1)
+         Sort Key: orders.o_orderkey, orders.o_orderpriority
+         Sort Method: external merge  Disk: 23528kB
+         Buffers: shared hit=26019 read=26376 dirtied=26200 written=10021, temp read=2941 written=2955
+         ->  Gather  (cost=1000.00..56396.63 rows=2620 width=122) (actual time=0.578..515.631 rows=1030392.00 loops=1)
+               Workers Planned: 2
+               Workers Launched: 2
+               Buffers: shared hit=26013 read=26376 dirtied=26200 written=10021
+               ->  Parallel Append  (cost=0.00..55134.63 rows=1092 width=122) (actual time=0.127..523.579 rows=343464.00 loops=3)
+                     Buffers: shared hit=26013 read=26376 dirtied=26200 written=10021
+                     ->  Parallel Seq Scan on orders  (cost=0.00..27564.58 rows=546 width=122) (actual time=0.080..183.799 rows=99905.00 loops=3)
+                           Filter: ((o_orderpriority)::text = '1-URGENT'::text)
+                           Rows Removed by Filter: 400095
+                           Buffers: shared hit=26010 read=183 dirtied=12204 written=176
+                     ->  Parallel Seq Scan on orders orders_1  (cost=0.00..27564.58 rows=546 width=122) (actual time=0.125..481.056 rows=365338.50 loops=2)
+                           Filter: ((o_orderstatus)::text = 'O'::text)
+                           Rows Removed by Filter: 384662
+                           Buffers: shared hit=3 read=26193 dirtied=13996 written=9845
+ Planning:
+   Buffers: shared hit=47 read=16
+ Planning Time: 0.478 ms
+ Execution Time: 902.407 ms
+(24 rows)
+

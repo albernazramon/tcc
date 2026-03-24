@@ -1,0 +1,22 @@
+                                                                    QUERY PLAN                                                                     
+---------------------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=176.84..23708.26 rows=14962 width=122) (actual time=26.996..209.011 rows=884532.00 loops=1)
+   Recheck Cond: (((o_orderpriority)::text = '1-URGENT'::text) OR ((o_orderstatus)::text = 'O'::text))
+   Heap Blocks: exact=26200
+   Buffers: shared hit=188 read=26889 written=15189
+   ->  BitmapOr  (cost=176.84..176.84 rows=15000 width=0) (actual time=24.040..24.041 rows=0.00 loops=1)
+         Buffers: shared read=877 written=316
+         ->  Bitmap Index Scan on idx_orders_orderpriority  (cost=0.00..84.68 rows=7500 width=0) (actual time=8.497..8.497 rows=299715.00 loops=1)
+               Index Cond: ((o_orderpriority)::text = '1-URGENT'::text)
+               Index Searches: 1
+               Buffers: shared read=259
+         ->  Bitmap Index Scan on idx_orders_orderstatus  (cost=0.00..84.68 rows=7500 width=0) (actual time=15.542..15.543 rows=730677.00 loops=1)
+               Index Cond: ((o_orderstatus)::text = 'O'::text)
+               Index Searches: 1
+               Buffers: shared read=618 written=316
+ Planning:
+   Buffers: shared hit=62 read=8
+ Planning Time: 0.446 ms
+ Execution Time: 232.343 ms
+(18 rows)
+
