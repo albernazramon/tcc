@@ -1,0 +1,12 @@
+                                                QUERY PLAN                                                 
+-----------------------------------------------------------------------------------------------------------
+ Seq Scan on supplier  (cost=0.00..239.20 rows=1 width=236) (actual time=0.189..5.020 rows=141.00 loops=1)
+   Filter: ((s_comment)::text ~~ '%special packages%'::text)
+   Rows Removed by Filter: 9859
+   Buffers: shared read=208 dirtied=205
+ Planning:
+   Buffers: shared hit=30 read=7
+ Planning Time: 0.344 ms
+ Execution Time: 5.082 ms
+(8 rows)
+

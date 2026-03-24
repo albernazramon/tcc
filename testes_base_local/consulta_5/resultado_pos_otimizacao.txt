@@ -1,0 +1,17 @@
+                                                                QUERY PLAN                                                                 
+-------------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on supplier  (cost=129.74..133.75 rows=1 width=236) (actual time=0.870..1.153 rows=141.00 loops=1)
+   Recheck Cond: ((s_comment)::text ~~ '%special packages%'::text)
+   Rows Removed by Index Recheck: 183
+   Heap Blocks: exact=173
+   Buffers: shared hit=204
+   ->  Bitmap Index Scan on trgm_supplier_s_comment_idx  (cost=0.00..129.74 rows=1 width=0) (actual time=0.830..0.830 rows=324.00 loops=1)
+         Index Cond: ((s_comment)::text ~~ '%special packages%'::text)
+         Index Searches: 1
+         Buffers: shared hit=31
+ Planning:
+   Buffers: shared hit=62 read=5 dirtied=1
+ Planning Time: 0.596 ms
+ Execution Time: 1.233 ms
+(13 rows)
+
