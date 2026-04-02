@@ -1,0 +1,19 @@
+services:
+  tpc-db:
+    image: postgres:18.1
+    container_name: tpc-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pg_data
+    ports:
+      - '5432:5432'
+    volumes:
+      - ../../../tpc.backup:/tmp/tpc.backup
+      - H:/tpc_pgdata:/var/lib/postgresql/data
+    shm_size: 2gb
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 60s
+      timeout: 5s
+      retries: 5

@@ -1,0 +1,6 @@
+Output format is csv.
+supp_nation,cust_nation,l_year,revenue
+FRANCE                   ,GERMANY                  ,1995,1060896625.0232
+FRANCE                   ,GERMANY                  ,1996,1046317062.9660
+GERMANY                  ,FRANCE                   ,1995,1095174906.1621
+GERMANY                  ,FRANCE                   ,1996,1074859702.3756

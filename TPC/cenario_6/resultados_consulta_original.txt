@@ -1,0 +1,24 @@
+                                                                                                        QUERY PLAN                                                                                                         
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=3381417.81..3381417.82 rows=1 width=32) (actual time=57684.794..57701.082 rows=1.00 loops=1)
+   Buffers: shared read=2250632
+   ->  Gather  (cost=3381417.59..3381417.80 rows=2 width=32) (actual time=57684.774..57701.064 rows=3.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared read=2250632
+         ->  Partial Aggregate  (cost=3380417.59..3380417.60 rows=1 width=32) (actual time=57657.020..57657.021 rows=1.00 loops=3)
+               Buffers: shared read=2250632
+               ->  Parallel Seq Scan on lineitem  (cost=0.00..3375556.92 rows=972133 width=12) (actual time=153.842..57496.153 rows=760373.00 loops=3)
+                     Filter: ((l_shipdate >= '1994-01-01'::date) AND (l_shipdate < '1995-01-01 00:00:00'::timestamp without time zone) AND (l_discount >= 0.05) AND (l_discount <= 0.07) AND (l_quantity < '24'::numeric))
+                     Rows Removed by Filter: 39237830
+                     Buffers: shared read=2250632
+ Planning:
+   Buffers: shared hit=40 read=19
+ Planning Time: 23.431 ms
+ JIT:
+   Functions: 17
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 2.083 ms (Deform 0.670 ms), Inlining 200.525 ms, Optimization 125.733 ms, Emission 130.856 ms, Total 459.197 ms
+ Execution Time: 57891.581 ms
+(20 rows)
+

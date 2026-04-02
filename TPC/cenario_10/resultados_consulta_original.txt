@@ -1,0 +1,61 @@
+                                                                                      QUERY PLAN                                                                                      
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=4264413.66..4264413.71 rows=20 width=202) (actual time=104965.149..106152.816 rows=20.00 loops=1)
+   Buffers: shared hit=60 read=2844908, temp read=326937 written=328012
+   ->  Sort  (cost=4264413.66..4267230.76 rows=1126843 width=202) (actual time=104722.680..105910.345 rows=20.00 loops=1)
+         Sort Key: (sum((lineitem.l_extendedprice * ('1'::numeric - lineitem.l_discount)))) DESC
+         Sort Method: top-N heapsort  Memory: 34kB
+         Buffers: shared hit=60 read=2844908, temp read=326937 written=328012
+         ->  GroupAggregate  (cost=4060932.72..4234428.77 rows=1126843 width=202) (actual time=98202.007..105747.383 rows=763483.00 loops=1)
+               Group Key: customer.c_custkey, customer.c_name, customer.c_acctbal, customer.c_phone, nation.n_name, customer.c_address, customer.c_comment
+               Buffers: shared hit=60 read=2844908, temp read=326937 written=328012
+               ->  Gather Merge  (cost=4060932.72..4192172.16 rows=1126843 width=182) (actual time=98201.911..104800.250 rows=2290399.00 loops=1)
+                     Workers Planned: 2
+                     Workers Launched: 2
+                     Buffers: shared hit=60 read=2844908, temp read=326937 written=328012
+                     ->  Sort  (cost=4059932.70..4061106.49 rows=469518 width=182) (actual time=98169.273..100085.294 rows=763466.33 loops=3)
+                           Sort Key: customer.c_custkey, customer.c_name, customer.c_acctbal, customer.c_phone, nation.n_name, customer.c_address, customer.c_comment
+                           Sort Method: external merge  Disk: 145288kB
+                           Buffers: shared hit=60 read=2844908, temp read=326937 written=328012
+                           Worker 0:  Sort Method: external merge  Disk: 145984kB
+                           Worker 1:  Sort Method: external merge  Disk: 145720kB
+                           ->  Hash Join  (cost=844584.26..3932248.17 rows=469518 width=182) (actual time=83593.041..90062.896 rows=763466.33 loops=3)
+                                 Hash Cond: (customer.c_nationkey = nation.n_nationkey)
+                                 Buffers: shared hit=2 read=2844908, temp read=217708 written=218656
+                                 ->  Parallel Hash Join  (cost=844582.70..3925790.74 rows=469518 width=160) (actual time=83478.577..89856.189 rows=763466.33 loops=3)
+                                       Hash Cond: (orders.o_custkey = customer.c_custkey)
+                                       Buffers: shared read=2844907, temp read=217708 written=218656
+                                       ->  Parallel Hash Join  (cost=717751.15..3763796.18 rows=469518 width=16) (actual time=70403.103..77642.747 rows=763466.33 loops=3)
+                                             Hash Cond: (lineitem.l_orderkey = orders.o_orderkey)
+                                             Buffers: shared read=2773065, temp read=144563 written=144624
+                                             ->  Parallel Seq Scan on lineitem  (cost=0.00..2875590.29 rows=12329177 width=16) (actual time=1.591..54380.772 rows=9870599.00 loops=3)
+                                                   Filter: (l_returnflag = 'R'::bpchar)
+                                                   Rows Removed by Filter: 30127604
+                                                   Buffers: shared read=2250632
+                                             ->  Parallel Hash  (cost=709940.62..709940.62 rows=476042 width=8) (actual time=6833.255..6833.256 rows=381963.33 loops=3)
+                                                   Buckets: 262144  Batches: 8  Memory Usage: 7712kB
+                                                   Buffers: shared read=522433, temp written=3460
+                                                   ->  Parallel Seq Scan on orders  (cost=0.00..709940.62 rows=476042 width=8) (actual time=1.208..6470.241 rows=381963.33 loops=3)
+                                                         Filter: ((o_orderdate >= '1993-10-01'::date) AND (o_orderdate < '1994-01-01 00:00:00'::timestamp without time zone))
+                                                         Rows Removed by Filter: 9618037
+                                                         Buffers: shared read=522433
+                                       ->  Parallel Hash  (cost=84344.02..84344.02 rows=1250202 width=148) (actual time=4466.787..4466.788 rows=1000000.00 loops=3)
+                                             Buckets: 65536  Batches: 128  Memory Usage: 4832kB
+                                             Buffers: shared read=71842, temp written=63048
+                                             ->  Parallel Seq Scan on customer  (cost=0.00..84344.02 rows=1250202 width=148) (actual time=0.963..203.569 rows=1000000.00 loops=3)
+                                                   Buffers: shared read=71842
+                                 ->  Hash  (cost=1.25..1.25 rows=25 width=30) (actual time=114.421..114.421 rows=25.00 loops=3)
+                                       Buckets: 1024  Batches: 1  Memory Usage: 10kB
+                                       Buffers: shared hit=2 read=1
+                                       ->  Seq Scan on nation  (cost=0.00..1.25 rows=25 width=30) (actual time=114.404..114.407 rows=25.00 loops=3)
+                                             Buffers: shared hit=2 read=1
+ Planning:
+   Buffers: shared hit=198 read=33
+ Planning Time: 41.116 ms
+ JIT:
+   Functions: 94
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 7.424 ms (Deform 3.729 ms), Inlining 160.906 ms, Optimization 227.728 ms, Emission 196.079 ms, Total 592.137 ms
+ Execution Time: 106352.190 ms
+(57 rows)
+
