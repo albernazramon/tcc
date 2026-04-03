@@ -2,9 +2,9 @@
 
 ## Queries Analisadas
 
-### Pré-Otimização: TODO
+### Pré-Otimização:
 
-**Problema:** TODO
+**Problema:** A criação e descarte de uma view temporária introduz sobrecarga desnecessária. Além disso, a view é referenciada duas vezes, o que pode levar à reexecução redundante da agregação e do filtro na tabela `lineitem`. A falta de índices em `l_shipdate` e `l_suppkey` força varreduras sequenciais (`Seq Scan`) custosas em tabelas grandes.
 
 ```sql
 -- using default substitutions
@@ -45,12 +45,43 @@ order by
 drop view revenue0;
 ```
 
-### Pós-Otimização: TODO
+### Pós-Otimização:
 
-**Alterações:** TODO
+**Alterações:** A view temporária foi substituída por uma **CTE (Common Table Expression)**, permitindo que o otimizador visualize melhor a consulta e evite recomputações redundantes. Foram recomendados índices estratégicos: um índice composto em `lineitem` (`l_shipdate`, `l_suppkey`) para acelerar simultaneamente o filtro de data e o agrupamento, e um índice em `supplier.s_suppkey` para otimizar a junção final.
 
 ```sql
-_scripts here_
+-- Índice composto para lineitem
+CREATE INDEX idx_lineitem_shipdate_suppkey ON public.lineitem (l_shipdate, l_suppkey);
+
+-- Índice para supplier
+CREATE INDEX idx_supplier_suppkey ON public.supplier (s_suppkey);
+
+WITH supplier_revenue AS (
+    SELECT
+        l_suppkey,
+        sum(l_extendedprice * (1 - l_discount)) AS total_revenue
+    FROM
+        lineitem
+    WHERE
+        l_shipdate >= date '1996-01-01'
+        AND l_shipdate < date '1996-04-01'
+    GROUP BY
+        l_suppkey
+)
+SELECT
+    s.s_suppkey,
+    s.s_name,
+    s.s_address,
+    s.s_phone,
+    sr.total_revenue
+FROM
+    supplier s
+JOIN
+    supplier_revenue sr ON s.s_suppkey = sr.l_suppkey
+WHERE
+    sr.total_revenue = (SELECT max(total_revenue) FROM supplier_revenue)
+ORDER BY
+    s.s_suppkey;
 ```
 
 ---

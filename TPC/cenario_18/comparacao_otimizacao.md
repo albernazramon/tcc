@@ -2,9 +2,9 @@
 
 ## Queries Analisadas
 
-### Pré-Otimização: TODO
+### Pré-Otimização:
 
-**Problema:** TODO
+**Problema:** A consulta original possui uma subconsulta ineficiente (`IN` com `GROUP BY` e `HAVING`) que força a agregação total da tabela `lineitem` antes de filtrar os resultados. Além disso, a consulta principal recalcula redundantemente a soma de quantidades, gerando processamento extra. A falta de índices adequados para o `ORDER BY` e `LIMIT` obriga o PostgreSQL a realizar um `Sort` completo e custoso em um grande volume de dados intermediários.
 
 ```sql
 -- using default substitutions
@@ -45,12 +45,49 @@ order by
 limit 100;
 ```
 
-### Pós-Otimização: TODO
+### Pós-Otimização:
 
-**Alterações:** TODO
+**Alterações:** A subconsulta foi refatorada para uma **CTE (Common Table Expression)** para pré-agregação e filtragem, eliminando a redundância de cálculos e simplificando o plano de execução. A consulta principal foi reescrita com **JOINs explícitos**. Foram recomendados índices compostos estratégicos: um em `lineitem` (`l_orderkey`, `l_quantity`) para acelerar a CTE, e outro em `orders` (`o_totalprice DESC`, `o_orderdate`, `o_custkey`, `o_orderkey`) para otimizar drasticamente o `ORDER BY` e o `LIMIT 100`, permitindo a recuperação direta das linhas ordenadas.
 
 ```sql
-_scripts here_
+-- Índice para a CTE de agregação
+CREATE INDEX IF NOT EXISTS idx_lineitem_orderkey_quantity ON public.lineitem (l_orderkey, l_quantity);
+
+-- Índice composto para ORDER BY, LIMIT e junções
+CREATE INDEX IF NOT EXISTS idx_orders_totalprice_date_custkey_orderkey ON public.orders (o_totalprice DESC, o_orderdate, o_custkey, o_orderkey);
+
+-- Índices para chaves de junção
+CREATE INDEX IF NOT EXISTS idx_orders_custkey ON public.orders (o_custkey);
+CREATE INDEX IF NOT EXISTS idx_customer_custkey ON public.customer (c_custkey);
+
+WITH OrderQuantities AS (
+    SELECT
+        l_orderkey,
+        SUM(l_quantity) AS total_quantity_for_order
+    FROM
+        lineitem
+    GROUP BY
+        l_orderkey
+    HAVING
+        SUM(l_quantity) > 300
+)
+SELECT
+    c.c_name,
+    c.c_custkey,
+    o.o_orderkey,
+    o.o_orderdate,
+    o.o_totalprice,
+    oq.total_quantity_for_order
+FROM
+    customer c
+JOIN
+    orders o ON c.c_custkey = o.o_custkey
+JOIN
+    OrderQuantities oq ON o.o_orderkey = oq.l_orderkey
+ORDER BY
+    o.o_totalprice DESC,
+    o.o_orderdate
+LIMIT 100;
 ```
 
 ---

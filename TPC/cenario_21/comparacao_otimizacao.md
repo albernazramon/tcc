@@ -2,9 +2,9 @@
 
 ## Queries Analisadas
 
-### Pré-Otimização: TODO
+### Pré-Otimização:
 
-**Problema:** TODO
+**Problema:** A consulta original sofre com o uso de duas subqueries correlacionadas (`EXISTS` e `NOT EXISTS`) no `WHERE`, que são reavaliadas para cada linha da tabela `lineitem`, gerando um desempenho extremamente lento. Além disso, a falta de índices adequados em colunas de filtro (`o_orderstatus`, `n_name`) e em chaves estrangeiras obriga o planejador a recorrer a varreduras sequenciais e `Bitmap Scans` caros.
 
 ```sql
 -- using default substitutions
@@ -52,12 +52,65 @@ order by
 limit 100;
 ```
 
-### Pós-Otimização: TODO
+### Pós-Otimização:
 
-**Alterações:** TODO
+**Alterações:** As subqueries correlacionadas foram substituídas por **CTEs (Common Table Expressions)** e **Anti-Joins (`LEFT JOIN / IS NULL`)**, permitindo que o PostgreSQL as processe de forma muito mais eficiente. Foram recomendados índices estratégicos para acelerar os filtros e as múltiplas junções, com destaque para um **índice composto abrangente em `lineitem`** (`l_orderkey`, `l_suppkey`, `l_receiptdate`, `l_commitdate`), que otimiza simultaneamente filtros, joins e as agregações das CTEs.
 
 ```sql
-_scripts here_
+-- Índices Recomendados
+CREATE INDEX idx_nation_name ON nation (n_name);
+CREATE INDEX idx_supplier_nationkey ON supplier (s_nationkey);
+CREATE INDEX idx_orders_orderstatus ON orders (o_orderstatus);
+CREATE INDEX idx_orders_orderkey ON orders (o_orderkey);
+CREATE INDEX idx_lineitem_composite ON lineitem (l_orderkey, l_suppkey, l_receiptdate, l_commitdate);
+
+WITH orders_with_multiple_suppliers AS (
+    SELECT
+        l_orderkey
+    FROM
+        lineitem
+    GROUP BY
+        l_orderkey
+    HAVING
+        COUNT(DISTINCT l_suppkey) > 1
+),
+orders_suppliers_with_late_others AS (
+    SELECT DISTINCT
+        l1.l_orderkey,
+        l1.l_suppkey
+    FROM
+        lineitem l1
+    JOIN
+        lineitem l3 ON l1.l_orderkey = l3.l_orderkey
+    WHERE
+        l1.l_suppkey <> l3.l_suppkey
+        AND l3.l_receiptdate > l3.l_commitdate
+)
+SELECT
+    s.s_name,
+    COUNT(*) AS numwait
+FROM
+    nation n
+JOIN
+    supplier s ON s.s_nationkey = n.n_nationkey
+JOIN
+    lineitem l1 ON s.s_suppkey = l1.l_suppkey
+JOIN
+    orders o ON l1.l_orderkey = o.o_orderkey
+LEFT JOIN
+    orders_suppliers_with_late_others oslo ON l1.l_orderkey = oslo.l_orderkey AND l1.l_suppkey = oslo.l_suppkey
+WHERE
+    n.n_name = 'SAUDI ARABIA'
+    AND o.o_orderstatus = 'F'
+    AND l1.l_receiptdate > l1.l_commitdate
+    AND l1.l_orderkey IN (SELECT l_orderkey FROM orders_with_multiple_suppliers)
+    AND oslo.l_orderkey IS NULL
+GROUP BY
+    s.s_name
+ORDER BY
+    numwait DESC,
+    s_name
+LIMIT 100;
 ```
 
 ---

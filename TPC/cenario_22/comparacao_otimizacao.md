@@ -2,9 +2,9 @@
 
 ## Queries Analisadas
 
-### Pré-Otimização: TODO
+### Pré-Otimização:
 
-**Problema:** TODO
+**Problema:** A consulta original apresenta redundância na filtragem da tabela `customer` tanto na consulta externa quanto na subconsulta de média, o que aumenta desnecessariamente o custo de CPU e I/O. Além disso, o uso da função `substring()` no `WHERE` torna a condição não-SARGable, impedindo o uso de índices B-tree padrão. A cláusula `NOT EXISTS` e o agrupamento em expressões calculadas também contribuem para a lentidão.
 
 ```sql
 -- using default substitutions
@@ -49,12 +49,51 @@ order by
 	cntrycode;
 ```
 
-### Pós-Otimização: TODO
+### Pós-Otimização:
 
-**Alterações:** TODO
+**Alterações:** A consulta foi otimizada utilizando **CTEs (Common Table Expressions)** para pré-filtrar os clientes e calcular a média uma única vez, evitando varreduras redundantes. O `NOT EXISTS` foi substituído por um **LEFT JOIN / IS NULL**, oferecendo mais flexibilidade ao otimizador. Foi recomendada a criação de um **índice funcional e parcial** em `customer` (`substring(c_phone FROM 1 FOR 2)`, `c_acctbal`), tornando o filtro e o agrupamento muito mais eficientes.
 
 ```sql
-_scripts here_
+-- Índice funcional e parcial na Tabela customer
+CREATE INDEX idx_customer_cntrycode_acctbal
+ON public.customer (substring(c_phone FROM 1 FOR 2), c_acctbal)
+WHERE c_acctbal > 0.00;
+
+-- Índice na Tabela orders
+CREATE INDEX idx_orders_custkey ON public.orders (o_custkey);
+
+WITH FilteredCustomers AS (
+    SELECT
+        c.c_custkey,
+        substring(c.c_phone FROM 1 FOR 2) AS cntrycode,
+        c.c_acctbal
+    FROM
+        customer c
+    WHERE
+        substring(c.c_phone FROM 1 FOR 2) IN ('13', '31', '23', '29', '30', '18', '17')
+        AND c.c_acctbal > 0.00
+),
+AvgFilteredAcctBal AS (
+    SELECT AVG(fc.c_acctbal) AS avg_bal
+    FROM FilteredCustomers fc
+)
+SELECT
+    fc.cntrycode,
+    COUNT(fc.c_custkey) AS numcust,
+    SUM(fc.c_acctbal) AS totacctbal
+FROM
+    FilteredCustomers fc
+CROSS JOIN
+    AvgFilteredAcctBal afab
+LEFT JOIN
+    orders o ON fc.c_custkey = o.o_custkey
+WHERE
+    fc.c_acctbal > afab.avg_bal
+    AND o.o_orderkey IS NULL
+GROUP BY
+    fc.cntrycode
+ORDER BY
+    fc.cntrycode;
 ```
 
 ---

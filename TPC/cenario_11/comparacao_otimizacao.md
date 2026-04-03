@@ -2,9 +2,9 @@
 
 ## Queries Analisadas
 
-### Pré-Otimização: TODO
+### Pré-Otimização:
 
-**Problema:** TODO
+**Problema:** O principal problema é a execução redundante da mesma lógica de junção e agregação tanto na consulta principal quanto na subconsulta da cláusula `HAVING`. Isso obriga o PostgreSQL a processar as tabelas `partsupp`, `supplier` e `nation` duas vezes, gerando um custo computacional e de I/O desnecessário. Além disso, a ordenação final por um valor agregado exige um passo de `Sort` explícito.
 
 ```sql
 -- using default substitutions
@@ -39,12 +39,40 @@ order by
 	value desc;
 ```
 
-### Pós-Otimização: TODO
+### Pós-Otimização:
 
-**Alterações:** TODO
+**Alterações:** A redundância foi eliminada através do uso de uma **função de janela (`SUM(...) OVER ()`)** dentro de uma subconsulta derivada. Isso permite que o total geral necessário para o filtro seja calculado uma única vez sobre os resultados já agregados, evitando a reexecução completa dos joins. Foram recomendados índices estratégicos para acelerar a filtragem inicial e as junções, incluindo um **índice de cobertura (`INCLUDE`)** em `partsupp` para possibilitar um `Index-Only Scan`.
 
 ```sql
-_scripts here_
+-- Índices Recomendados
+CREATE INDEX idx_nation_name ON nation (n_name);
+CREATE INDEX idx_nation_nkey ON nation (n_nationkey);
+CREATE INDEX idx_supplier_nkey_skey ON supplier (s_nationkey, s_suppkey);
+CREATE INDEX idx_partsupp_skey_pkey_include ON partsupp (ps_suppkey, ps_partkey) INCLUDE (ps_supplycost, ps_availqty);
+
+SELECT
+    ps_partkey,
+    value
+FROM (
+    SELECT
+        ps_partkey,
+        sum(ps_supplycost * ps_availqty) AS value,
+        sum(sum(ps_supplycost * ps_availqty)) OVER () AS total_germany_value
+    FROM
+        partsupp
+    JOIN
+        supplier ON ps_suppkey = s_suppkey
+    JOIN
+        nation ON s_nationkey = n_nationkey
+    WHERE
+        n_name = 'GERMANY'
+    GROUP BY
+        ps_partkey
+) AS grouped_values_with_total
+WHERE
+    value > total_germany_value * 0.0001000000
+ORDER BY
+    value DESC;
 ```
 
 ---

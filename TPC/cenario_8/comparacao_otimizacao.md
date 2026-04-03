@@ -2,9 +2,9 @@
 
 ## Queries Analisadas
 
-### Pré-Otimização: TODO
+### Pré-Otimização:
 
-**Problema:** TODO
+**Problema:** A consulta original apresenta lentidão devido a varreduras sequenciais (`Seq Scans`) em tabelas grandes como `orders`, `part` e `lineitem`, causadas pela falta de índices em colunas de filtro (`o_orderdate`, `p_type`, `r_name`). Joins ineficientes e a estrutura de subconsulta também contribuem para o alto custo de CPU e I/O, além da necessidade de ordenação explícita para o agrupamento por ano.
 
 ```sql
 -- using default substitutions
@@ -49,12 +49,54 @@ order by
 	o_year;
 ```
 
-### Pós-Otimização: TODO
+### Pós-Otimização:
 
-**Alterações:** TODO
+**Alterações:** A subconsulta foi eliminada ("achatamento") e substituída por `JOIN`s explícitos para simplificar o plano de execução. Foram recomendados índices estratégicos para as colunas de filtro (`o_orderdate`, `p_type`, `r_name`) e para todas as chaves estrangeiras envolvidas nas junções. Essas alterações permitem que o PostgreSQL utilize `Index Scans` ou `Bitmap Index Scans`, resultando em um processamento muito mais rápido e eficiente de filtros e junções.
 
 ```sql
-_scripts here_
+-- Índices para colunas de filtro
+CREATE INDEX IF NOT EXISTS idx_orders_o_orderdate ON public.orders (o_orderdate);
+CREATE INDEX IF NOT EXISTS idx_part_p_type ON public.part (p_type);
+CREATE INDEX IF NOT EXISTS idx_region_r_name ON public.region (r_name);
+
+-- Índices para chaves estrangeiras (FKs)
+CREATE INDEX IF NOT EXISTS idx_lineitem_l_partkey ON public.lineitem (l_partkey);
+CREATE INDEX IF NOT EXISTS idx_lineitem_l_suppkey ON public.lineitem (l_suppkey);
+CREATE INDEX IF NOT EXISTS idx_orders_o_custkey ON public.orders (o_custkey);
+CREATE INDEX IF NOT EXISTS idx_customer_c_nationkey ON public.customer (c_nationkey);
+CREATE INDEX IF NOT EXISTS idx_nation_n_regionkey ON public.nation (n_regionkey);
+CREATE INDEX IF NOT EXISTS idx_supplier_s_nationkey ON public.supplier (s_nationkey);
+
+SELECT
+    EXTRACT(YEAR FROM o.o_orderdate) AS o_year,
+    SUM(CASE
+        WHEN n2.n_name = 'BRAZIL' THEN l.l_extendedprice * (1 - l.l_discount)
+        ELSE 0
+    END) / SUM(l.l_extendedprice * (1 - l.l_discount)) AS mkt_share
+FROM
+    part p
+JOIN
+    lineitem l ON p.p_partkey = l.l_partkey
+JOIN
+    supplier s ON s.s_suppkey = l.l_suppkey
+JOIN
+    orders o ON l.l_orderkey = o.o_orderkey
+JOIN
+    customer c ON o.o_custkey = c.c_custkey
+JOIN
+    nation n1 ON c.c_nationkey = n1.n_nationkey
+JOIN
+    region r ON n1.n_regionkey = r.r_regionkey
+JOIN
+    nation n2 ON s.s_nationkey = n2.n_nationkey
+WHERE
+    r.r_name = 'AMERICA'
+    AND o.o_orderdate BETWEEN DATE '1995-01-01' AND DATE '1996-12-31'
+    AND p.p_type = 'ECONOMY ANODIZED STEEL'
+GROUP BY
+    o_year
+ORDER BY
+    o_year;
 ```
 
 ---

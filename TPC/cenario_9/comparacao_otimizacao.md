@@ -2,9 +2,9 @@
 
 ## Queries Analisadas
 
-### Pré-Otimização: TODO
+### Pré-Otimização:
 
-**Problema:** TODO
+**Problema:** O maior gargalo é o filtro `p_name LIKE '%green%'`, que impede o uso de índices B-tree padrão e força um `Seq Scan` em toda a tabela `part`. Além disso, a ausência de índices em chaves estrangeiras dificulta as junções entre as seis tabelas envolvidas, e o agrupamento/ordenação final exige processamento intensivo de memória e CPU (provável `Hash Aggregate` e `Sort` explícito).
 
 ```sql
 -- using default substitutions
@@ -44,12 +44,49 @@ order by
 	o_year desc;
 ```
 
-### Pós-Otimização: TODO
+### Pós-Otimização:
 
-**Alterações:** TODO
+**Alterações:** A consulta foi reescrita com `JOIN`s explícitos para maior clareza. A otimização principal consiste na criação de um **índice GIN com pg_trgm** na coluna `p_name`, permitindo buscas eficientes com curingas iniciais. Também foram sugeridos índices B-tree em todas as chaves estrangeiras (`l_partkey`, `l_suppkey`, `o_orderkey`, etc.) e um índice de expressão para `EXTRACT(YEAR FROM o_orderdate)`, reduzindo drasticamente o volume de dados processados e agilizando as junções e a agregação.
 
 ```sql
-_scripts here_
+-- Habilita a extensão pg_trgm para buscas de texto
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX idx_part_p_name_trgm ON public.part USING GIN (p_name gin_trgm_ops);
+
+-- Índices para otimizar as junções (chaves estrangeiras)
+CREATE INDEX idx_lineitem_partkey ON public.lineitem (l_partkey);
+CREATE INDEX idx_lineitem_suppkey ON public.lineitem (l_suppkey);
+CREATE INDEX idx_lineitem_orderkey ON public.lineitem (l_orderkey);
+CREATE INDEX idx_supplier_nationkey ON public.supplier (s_nationkey);
+
+-- Índices para auxiliar no agrupamento e ordenação
+CREATE INDEX idx_orders_o_orderdate_year ON public.orders (EXTRACT(YEAR FROM o_orderdate));
+CREATE INDEX idx_nation_name ON public.nation (n_name);
+
+SELECT
+    n.n_name AS nation,
+    EXTRACT(YEAR FROM o.o_orderdate) AS o_year,
+    SUM(l.l_extendedprice * (1 - l.l_discount) - ps.ps_supplycost * l.l_quantity) AS sum_profit
+FROM
+    part AS p
+JOIN
+    lineitem AS l ON p.p_partkey = l.l_partkey
+JOIN
+    partsupp AS ps ON l.l_partkey = ps.ps_partkey AND l.l_suppkey = ps.ps_suppkey
+JOIN
+    supplier AS s ON l.l_suppkey = s.s_suppkey
+JOIN
+    orders AS o ON l.l_orderkey = o.o_orderkey
+JOIN
+    nation AS n ON s.s_nationkey = n.n_nationkey
+WHERE
+    p.p_name LIKE '%green%'
+GROUP BY
+    n.n_name,
+    EXTRACT(YEAR FROM o.o_orderdate)
+ORDER BY
+    n.n_name,
+    EXTRACT(YEAR FROM o.o_orderdate) DESC;
 ```
 
 ---
