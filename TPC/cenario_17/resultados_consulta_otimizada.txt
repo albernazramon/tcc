@@ -1,0 +1,36 @@
+                                                                                           QUERY PLAN                                                                                           
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=2218560.02..2218560.04 rows=1 width=32) (actual time=43336.207..43336.209 rows=1.00 loops=1)
+   Buffers: shared hit=58211956 read=236350 written=4
+   ->  Nested Loop  (cost=1.56..2218513.30 rows=18687 width=8) (actual time=227.113..43332.095 rows=5526.00 loops=1)
+         Join Filter: (li.l_partkey = p.p_partkey)
+         Buffers: shared hit=58211956 read=236350 written=4
+         ->  Merge Join  (cost=0.99..2166638.54 rows=1990 width=40) (actual time=226.840..42565.412 rows=2044.00 loops=1)
+               Merge Cond: (p.p_partkey = lineitem.l_partkey)
+               Buffers: shared hit=58204742 read=229847 written=4
+               ->  Index Only Scan using idx_part_brand_container_partkey on part p  (cost=0.43..92.23 rows=1990 width=4) (actual time=0.908..3.592 rows=2044.00 loops=1)
+                     Index Cond: ((p_brand = 'Brand#23'::bpchar) AND (p_container = 'MED BOX'::bpchar))
+                     Heap Fetches: 0
+                     Index Searches: 1
+                     Buffers: shared hit=1 read=16
+               ->  GroupAggregate  (cost=0.56..2161198.03 rows=2129364 width=36) (actual time=2.946..42229.684 rows=1999712.00 loops=1)
+                     Group Key: lineitem.l_partkey
+                     Buffers: shared hit=58204741 read=229831 written=4
+                     ->  Index Only Scan using idx_lineitem_partkey_quantity on lineitem  (cost=0.56..1829327.31 rows=59986052 width=9) (actual time=0.028..36594.846 rows=59977483.00 loops=1)
+                           Heap Fetches: 0
+                           Index Searches: 1
+                           Buffers: shared hit=58204741 read=229831 written=4
+         ->  Index Scan using idx_lineitem_partkey_quantity on lineitem li  (cost=0.56..25.96 rows=9 width=17) (actual time=0.169..0.372 rows=2.70 loops=2044)
+               Index Cond: ((l_partkey = lineitem.l_partkey) AND (l_quantity < ((0.2 * avg(lineitem.l_quantity)))))
+               Index Searches: 2044
+               Buffers: shared hit=7214 read=6503
+ Planning:
+   Buffers: shared hit=582 read=75 dirtied=3
+ Planning Time: 50.938 ms
+ JIT:
+   Functions: 17
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 0.949 ms (Deform 0.142 ms), Inlining 59.620 ms, Optimization 55.183 ms, Emission 53.514 ms, Total 169.267 ms
+ Execution Time: 43524.825 ms
+(32 rows)
+

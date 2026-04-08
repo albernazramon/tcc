@@ -1,0 +1,52 @@
+                                                                                        QUERY PLAN                                                                                        
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=2150110.62..2150221.72 rows=5 width=24) (actual time=74821.940..75069.748 rows=5.00 loops=1)
+   Group Key: o.o_orderpriority
+   Buffers: shared hit=3701 read=1127965, temp read=379191 written=486505
+   ->  Sort  (cost=2150110.62..2150147.64 rows=14806 width=20) (actual time=74800.484..75029.274 rows=526040.00 loops=1)
+         Sort Key: o.o_orderpriority
+         Sort Method: external merge  Disk: 15496kB
+         Buffers: shared hit=3701 read=1127965, temp read=379191 written=486505
+         ->  Hash Join  (cost=2030012.24..2149085.02 rows=14806 width=20) (actual time=53251.602..74373.255 rows=526040.00 loops=1)
+               Hash Cond: (lineitem.l_orderkey = o.o_orderkey)
+               Buffers: shared hit=3698 read=1127965, temp read=377254 written=484560
+               ->  Unique  (cost=1996789.73..2107870.52 rows=389048 width=4) (actual time=52307.637..57224.159 rows=13753474.00 loops=1)
+                     Buffers: shared hit=14 read=1125128, temp read=339539 written=446845
+                     ->  Gather Merge  (cost=1996789.73..2105536.23 rows=933715 width=4) (actual time=52307.636..55877.212 rows=13754737.00 loops=1)
+                           Workers Planned: 2
+                           Workers Launched: 2
+                           Buffers: shared hit=14 read=1125128, temp read=339539 written=446845
+                           ->  Sort  (cost=1995789.71..1996762.33 rows=389048 width=4) (actual time=52045.596..53031.801 rows=4584912.33 loops=3)
+                                 Sort Key: lineitem.l_orderkey
+                                 Sort Method: external merge  Disk: 54232kB
+                                 Buffers: shared hit=14 read=1125128, temp read=339539 written=446845
+                                 Worker 0:  Sort Method: external merge  Disk: 53808kB
+                                 Worker 1:  Sort Method: external merge  Disk: 53776kB
+                                 ->  HashAggregate  (cost=1885367.89..1954347.40 rows=389048 width=4) (actual time=24484.708..48596.626 rows=4584912.33 loops=3)
+                                       Group Key: lineitem.l_orderkey
+                                       Planned Partitions: 4  Batches: 73  Memory Usage: 8289kB  Disk Usage: 384456kB
+                                       Buffers: shared read=1125128, temp read=299121 written=406349
+                                       Worker 0:  Batches: 85  Memory Usage: 8257kB  Disk Usage: 382760kB
+                                       Worker 1:  Batches: 85  Memory Usage: 8257kB  Disk Usage: 381720kB
+                                       ->  Parallel Seq Scan on lineitem  (cost=0.00..1437555.35 rows=8331396 width=4) (actual time=59.687..2368.295 rows=12643116.00 loops=3)
+                                             Filter: (l_commitdate < l_receiptdate)
+                                             Rows Removed by Filter: 7352235
+                                             Buffers: shared read=1125128
+               ->  Hash  (cost=22741.76..22741.76 rows=570860 width=20) (actual time=936.929..936.930 rows=573671.00 loops=1)
+                     Buckets: 131072  Batches: 8  Memory Usage: 4663kB
+                     Buffers: shared hit=3684 read=2837, temp written=2448
+                     ->  Index Only Scan using idx_orders_date_priority_key on orders o  (cost=0.56..22741.76 rows=570860 width=20) (actual time=183.664..580.097 rows=573671.00 loops=1)
+                           Index Cond: ((o_orderdate >= '1993-07-01'::date) AND (o_orderdate < '1993-10-01 00:00:00'::timestamp without time zone))
+                           Heap Fetches: 0
+                           Index Searches: 1
+                           Buffers: shared hit=3684 read=2837
+ Planning:
+   Buffers: shared hit=212 read=32 dirtied=2
+ Planning Time: 25.913 ms
+ JIT:
+   Functions: 52
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 2.923 ms (Deform 0.835 ms), Inlining 150.788 ms, Optimization 120.776 ms, Emission 96.133 ms, Total 370.619 ms
+ Execution Time: 75264.236 ms
+(48 rows)
+

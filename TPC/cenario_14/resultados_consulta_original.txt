@@ -1,32 +1,32 @@
-                                                                         QUERY PLAN                                                                          
--------------------------------------------------------------------------------------------------------------------------------------------------------------
- Finalize Aggregate  (cost=3164958.41..3164958.42 rows=1 width=32) (actual time=66129.472..66662.389 rows=1.00 loops=1)
-   Buffers: shared read=2332550, temp read=30006 written=30732
-   ->  Gather  (cost=3164958.17..3164958.38 rows=2 width=64) (actual time=66127.825..66662.357 rows=3.00 loops=1)
+                                                                        QUERY PLAN                                                                         
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=1583196.11..1583196.12 rows=1 width=32) (actual time=17800.697..18076.564 rows=1.00 loops=1)
+   Buffers: shared read=1166089, temp read=14827 written=15172
+   ->  Gather  (cost=1583195.87..1583196.08 rows=2 width=64) (actual time=17800.331..18076.540 rows=3.00 loops=1)
          Workers Planned: 2
          Workers Launched: 2
-         Buffers: shared read=2332550, temp read=30006 written=30732
-         ->  Partial Aggregate  (cost=3163958.17..3163958.18 rows=1 width=64) (actual time=66102.842..66103.014 rows=1.00 loops=3)
-               Buffers: shared read=2332550, temp read=30006 written=30732
-               ->  Parallel Hash Join  (cost=130809.88..3153788.04 rows=581150 width=33) (actual time=64521.899..65990.798 rows=498994.33 loops=3)
+         Buffers: shared read=1166089, temp read=14827 written=15172
+         ->  Partial Aggregate  (cost=1582195.87..1582195.88 rows=1 width=64) (actual time=17773.928..17773.932 rows=1.00 loops=3)
+               Buffers: shared read=1166089, temp read=14827 written=15172
+               ->  Parallel Hash Join  (cost=65407.65..1576729.92 rows=312340 width=33) (actual time=16946.184..17716.245 rows=249741.00 loops=3)
                      Hash Cond: (lineitem.l_partkey = part.p_partkey)
-                     Buffers: shared read=2332550, temp read=30006 written=30732
-                     ->  Parallel Seq Scan on lineitem  (cost=0.00..3000581.95 rows=581150 width=16) (actual time=2.864..60868.415 rows=498994.33 loops=3)
+                     Buffers: shared read=1166089, temp read=14827 written=15172
+                     ->  Parallel Seq Scan on lineitem  (cost=0.00..1499984.07 rows=321005 width=16) (actual time=1.851..15019.204 rows=249741.00 loops=3)
                            Filter: ((l_shipdate >= '1995-09-01'::date) AND (l_shipdate < '1995-10-01 00:00:00'::timestamp without time zone))
-                           Rows Removed by Filter: 39499208
-                           Buffers: shared read=2250632
-                     ->  Parallel Hash  (cost=98584.17..98584.17 rows=1666617 width=25) (actual time=2713.270..2713.271 rows=1333333.33 loops=3)
-                           Buckets: 131072  Batches: 64  Memory Usage: 4864kB
-                           Buffers: shared read=81918, temp written=23052
-                           ->  Parallel Seq Scan on part  (cost=0.00..98584.17 rows=1666617 width=25) (actual time=161.670..836.139 rows=1333333.33 loops=3)
-                                 Buffers: shared read=81918
+                           Rows Removed by Filter: 19745610
+                           Buffers: shared read=1125128
+                     ->  Parallel Hash  (cost=49294.18..49294.18 rows=833318 width=25) (actual time=1361.676..1361.677 rows=666666.67 loops=3)
+                           Buckets: 131072  Batches: 32  Memory Usage: 4864kB
+                           Buffers: shared read=40961, temp written=11332
+                           ->  Parallel Seq Scan on part  (cost=0.00..49294.18 rows=833318 width=25) (actual time=169.151..290.585 rows=666666.67 loops=3)
+                                 Buffers: shared read=40961
  Planning:
    Buffers: shared hit=129 read=33
- Planning Time: 26.774 ms
+ Planning Time: 22.873 ms
  JIT:
    Functions: 44
    Options: Inlining true, Optimization true, Expressions true, Deforming true
-   Timing: Generation 3.057 ms (Deform 0.800 ms), Inlining 183.233 ms, Optimization 143.437 ms, Emission 155.661 ms, Total 485.388 ms
- Execution Time: 66854.924 ms
+   Timing: Generation 3.159 ms (Deform 0.830 ms), Inlining 189.471 ms, Optimization 140.790 ms, Emission 175.396 ms, Total 508.816 ms
+ Execution Time: 18268.471 ms
 (28 rows)
 

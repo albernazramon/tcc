@@ -1,0 +1,63 @@
+                                                                                    QUERY PLAN                                                                                     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=533578.52..533960.07 rows=152618 width=44) (actual time=7261.768..7310.782 rows=27840.00 loops=1)
+   Sort Key: (count(DISTINCT ps.ps_suppkey)) DESC, p.p_brand, p.p_type, p.p_size
+   Sort Method: quicksort  Memory: 2507kB
+   Buffers: shared hit=291 read=216371, temp read=36622 written=36672
+   ->  GroupAggregate  (cost=366651.27..515741.44 rows=152618 width=44) (actual time=6398.894..7268.224 rows=27840.00 loops=1)
+         Group Key: p.p_brand, p.p_type, p.p_size
+         Buffers: shared hit=288 read=216371, temp read=36622 written=36672
+         ->  Gather Merge  (cost=366651.27..502547.03 rows=1166823 width=40) (actual time=6398.837..7169.701 rows=1186602.00 loops=1)
+               Workers Planned: 2
+               Workers Launched: 2
+               Buffers: shared hit=288 read=216371, temp read=36622 written=36672
+               ->  Sort  (cost=365651.25..366866.69 rows=486176 width=40) (actual time=6367.490..6755.383 rows=395534.00 loops=3)
+                     Sort Key: p.p_brand, p.p_type, p.p_size, ps.ps_suppkey
+                     Sort Method: external merge  Disk: 20048kB
+                     Buffers: shared hit=288 read=216371, temp read=36622 written=36672
+                     Worker 0:  Sort Method: external merge  Disk: 20160kB
+                     Worker 1:  Sort Method: external merge  Disk: 20400kB
+                     ->  Hash Anti Join  (cost=50398.28..306432.70 rows=486176 width=40) (actual time=3999.254..5357.965 rows=395534.00 loops=3)
+                           Hash Cond: (ps.ps_suppkey = supplier.s_suppkey)
+                           Buffers: shared hit=244 read=216371, temp read=29046 written=29072
+                           ->  Parallel Hash Join  (cost=50184.81..300081.08 rows=486225 width=40) (actual time=3995.687..5314.387 rows=395765.33 loops=3)
+                                 Hash Cond: (ps.ps_partkey = p.p_partkey)
+                                 Buffers: shared hit=9 read=216285, temp read=29046 written=29072
+                                 ->  Parallel Seq Scan on partsupp ps  (cost=0.00..208378.33 rows=3333333 width=8) (actual time=1.253..272.347 rows=2666666.67 loops=3)
+                                       Buffers: shared read=175045
+                                 ->  Parallel Hash  (cost=47715.36..47715.36 rows=121556 width=40) (actual time=954.327..954.328 rows=98941.33 loops=3)
+                                       Buckets: 131072  Batches: 4  Memory Usage: 6656kB
+                                       Buffers: shared hit=9 read=41240, temp written=1708
+                                       ->  Parallel Bitmap Heap Scan on part p  (cost=3457.83..47715.36 rows=121556 width=40) (actual time=239.128..807.559 rows=98941.33 loops=3)
+                                             Recheck Cond: (p_size = ANY ('{49,14,23,45,19,3,36,9}'::integer[]))
+                                             Filter: ((p_brand <> 'Brand#45'::bpchar) AND ((p_type)::text !~~ 'MEDIUM POLISHED%'::text))
+                                             Rows Removed by Filter: 7621
+                                             Heap Blocks: exact=13775
+                                             Buffers: shared hit=9 read=41240
+                                             Worker 0:  Heap Blocks: exact=13720
+                                             Worker 1:  Heap Blocks: exact=13454
+                                             ->  Bitmap Index Scan on idx_part_psize  (cost=0.00..3384.90 rows=316467 width=0) (actual time=72.831..72.831 rows=319686.00 loops=1)
+                                                   Index Cond: (p_size = ANY ('{49,14,23,45,19,3,36,9}'::integer[]))
+                                                   Index Searches: 8
+                                                   Buffers: shared hit=9 read=291
+                           ->  Hash  (cost=213.34..213.34 rows=10 width=4) (actual time=3.553..3.554 rows=56.00 loops=3)
+                                 Buckets: 1024  Batches: 1  Memory Usage: 10kB
+                                 Buffers: shared hit=235 read=86
+                                 ->  Bitmap Heap Scan on supplier  (cost=175.23..213.34 rows=10 width=4) (actual time=2.382..3.539 rows=56.00 loops=3)
+                                       Recheck Cond: ((s_comment)::text ~~ '%Customer%Complaints%'::text)
+                                       Heap Blocks: exact=55
+                                       Buffers: shared hit=235 read=86
+                                       ->  Bitmap Index Scan on idx_supplier_s_comment_trgm  (cost=0.00..175.23 rows=10 width=0) (actual time=1.984..1.985 rows=56.00 loops=3)
+                                             Index Cond: ((s_comment)::text ~~ '%Customer%Complaints%'::text)
+                                             Index Searches: 3
+                                             Buffers: shared hit=125 read=31
+ Planning:
+   Buffers: shared hit=401 read=74 dirtied=2
+ Planning Time: 39.360 ms
+ JIT:
+   Functions: 72
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 3.385 ms (Deform 1.089 ms), Inlining 177.185 ms, Optimization 203.050 ms, Emission 173.331 ms, Total 556.952 ms
+ Execution Time: 7500.371 ms
+(59 rows)
+

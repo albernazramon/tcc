@@ -1,0 +1,48 @@
+                                                                            QUERY PLAN                                                                            
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=425734.57..425734.59 rows=1 width=72) (actual time=210471.259..210478.977 rows=7.00 loops=1)
+   Group Key: fc.cntrycode
+   Buffers: shared hit=670066 read=1842178 written=3, temp read=1118 written=1118
+   CTE filteredcustomers
+     ->  Bitmap Heap Scan on customer c  (cost=1116.65..40450.28 rows=47699 width=42) (actual time=247.027..498.066 rows=381776.00 loops=1)
+           Recheck Cond: ((SUBSTRING(c_phone FROM 1 FOR 2) = ANY ('{13,31,23,29,30,18,17}'::text[])) AND (c_acctbal > 0.00))
+           Heap Blocks: exact=35924
+           Buffers: shared hit=3 read=37394
+           ->  Bitmap Index Scan on idx_customer_cntrycode_acctbal  (cost=0.00..1104.73 rows=47699 width=0) (actual time=204.747..204.747 rows=381776.00 loops=1)
+                 Index Cond: (SUBSTRING(c_phone FROM 1 FOR 2) = ANY ('{13,31,23,29,30,18,17}'::text[]))
+                 Index Searches: 4
+                 Buffers: shared hit=3 read=1470
+   ->  Sort  (cost=385284.29..385284.30 rows=1 width=54) (actual time=210469.955..210472.142 rows=63914.00 loops=1)
+         Sort Key: fc.cntrycode
+         Sort Method: quicksort  Memory: 3534kB
+         Buffers: shared hit=670066 read=1842178 written=3, temp read=1118 written=1118
+         ->  Nested Loop Left Join  (cost=1073.66..385284.28 rows=1 width=54) (actual time=830.338..210425.206 rows=63914.00 loops=1)
+               Filter: (o.o_orderkey IS NULL)
+               Rows Removed by Filter: 1902836
+               Buffers: shared hit=670063 read=1842178 written=3, temp read=1118 written=1118
+               ->  Nested Loop  (cost=1073.23..2623.46 rows=15900 width=54) (actual time=829.988..1189.845 rows=190691.00 loops=1)
+                     Join Filter: (fc.c_acctbal > (avg(fc_1.c_acctbal)))
+                     Rows Removed by Join Filter: 191085
+                     Buffers: shared hit=3 read=37394, temp read=1118 written=1118
+                     ->  Aggregate  (cost=1073.23..1073.24 rows=1 width=32) (actual time=829.749..829.750 rows=1.00 loops=1)
+                           Buffers: shared hit=3 read=37394, temp written=1117
+                           ->  CTE Scan on filteredcustomers fc_1  (cost=0.00..953.98 rows=47699 width=18) (actual time=247.030..792.430 rows=381776.00 loops=1)
+                                 Storage: Disk  Maximum Storage: 8941kB
+                                 Buffers: shared hit=3 read=37394, temp written=1117
+                     ->  CTE Scan on filteredcustomers fc  (cost=0.00..953.98 rows=47699 width=54) (actual time=0.224..220.781 rows=381776.00 loops=1)
+                           Storage: Disk  Maximum Storage: 8941kB
+                           Buffers: temp read=1118 written=1
+               ->  Index Scan using idx_orders_o_custkey on orders o  (cost=0.43..23.91 rows=16 width=8) (actual time=0.092..1.093 rows=9.98 loops=190691)
+                     Index Cond: (o_custkey = fc.c_custkey)
+                     Index Searches: 190691
+                     Buffers: shared hit=670060 read=1804784 written=3
+ Planning:
+   Buffers: shared hit=541 read=62 dirtied=2
+ Planning Time: 37.027 ms
+ JIT:
+   Functions: 22
+   Options: Inlining false, Optimization false, Expressions true, Deforming true
+   Timing: Generation 1.315 ms (Deform 0.399 ms), Inlining 0.000 ms, Optimization 3.767 ms, Emission 33.550 ms, Total 38.632 ms
+ Execution Time: 210673.662 ms
+(44 rows)
+

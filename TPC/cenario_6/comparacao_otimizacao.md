@@ -46,16 +46,16 @@ where
 
 | Métrica                    | Pré-Otimização | Pós-Otimização | Diferença / Impacto |
 | :------------------------- | :------------- | :------------- | :------------------ |
-| **Tempo de Execução**      | 57.891,58 ms   |                |                     |
-| **Custo Inicial Estimado** | 3.381.417,81   |                |                     |
-| **Custo Total Estimado**   | 3.381.417,82   |                |                     |
-| **Linhas**                 | 1              |                |                     |
-| **Memória: Hit**           | -              |                |                     |
-| **Memória: Read**          | 2.250.632      |                |                     |
-| **Memória: Dirtied**       | -              |                |                     |
-| **Memória: Written**       | -              |                |                     |
-| **Temp Read**              | -              |                |                     |
-| **Temp Written**           | -              |                |                     |
+| **Tempo de Execução**      | 15.480,94 ms   | 14.762,93 ms   |                     |
+| **Custo Inicial Estimado** | 1.690.714,70   | 1.690.822,79   |                     |
+| **Custo Total Estimado**   | 1.690.714,71   | 1.690.822,80   |                     |
+| **Linhas**                 | 1              | 1              |                     |
+| **Memória: Hit**           | -              | -              |                     |
+| **Memória: Read**          | 1.125.128      | 1.125.128      |                     |
+| **Memória: Dirtied**       | -              | -              |                     |
+| **Memória: Written**       | -              | -              |                     |
+| **Temp Read**              | -              | -              |                     |
+| **Temp Written**           | -              | -              |                     |
 
 ### Resultados da Consulta (Registros)
 

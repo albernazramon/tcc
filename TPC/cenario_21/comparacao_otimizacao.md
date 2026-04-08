@@ -117,22 +117,15 @@ LIMIT 100;
 
 ## Comparação de Desempenho
 
-X -> Não foi possível executar a consulta dentro do tempo limite estabelecido (20 minutos).
-
 | Métrica                    | Pré-Otimização | Pós-Otimização | Diferença / Impacto |
 | :------------------------- | :------------- | :------------- | :------------------ |
-| **Tempo de Execução**      | X              |                |                     |
-| **Custo Inicial Estimado** | X              |                |                     |
-| **Custo Total Estimado**   | X              |                |                     |
-| **Linhas**                 | X              |                |                     |
-| **Memória: Hit**           | X              |                |                     |
-| **Memória: Read**          | X              |                |                     |
-| **Memória: Dirtied**       | X              |                |                     |
-| **Memória: Written**       | X              |                |                     |
-| **Temp Read**              | X              |                |                     |
-| **Temp Written**           | X              |                |                     |
-
-### Resultados da Consulta (Registros)
-
-- **Pré-Otimização:** [resultados_consulta_original](.\resultados_consulta_original.csv)
-- **Pós-Otimização:** [resultados_consulta_otimizada](.\resultados_consulta_otimizada.csv)
+| **Tempo de Execução**      |  | 407.389,74 ms | |
+| **Custo Inicial Estimado** |  | 36.894.482,18 | |
+| **Custo Total Estimado**   |  | 36.894.482,43 | |
+| **Linhas**                 |  | 100 | |
+| **Memória: Hit**           | - | 20.408.936 | |
+| **Memória: Read**          | - | 6.513.663 | |
+| **Memória: Dirtied**       | - | - | |
+| **Memória: Written**       | - | 3 | |
+| **Temp Read**              | - | 295.111 | |
+| **Temp Written**           | - | - | |

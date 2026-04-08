@@ -1,42 +1,42 @@
-                                                                                 QUERY PLAN                                                                                 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- Finalize GroupAggregate  (cost=3932502.28..3932553.47 rows=5 width=24) (actual time=90618.354..94826.848 rows=5.00 loops=1)
+                                                                                QUERY PLAN                                                                                
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=1966862.42..1966917.66 rows=5 width=24) (actual time=31418.876..33531.989 rows=5.00 loops=1)
    Group Key: orders.o_orderpriority
-   Buffers: shared hit=14 read=2773065, temp read=231388 written=234005
-   ->  Gather Merge  (cost=3932502.28..3932553.36 rows=12 width=24) (actual time=90570.367..94826.763 rows=15.00 loops=1)
+   Buffers: shared hit=14 read=1386331, temp read=115471 written=116644
+   ->  Gather Merge  (cost=1966862.42..1966917.55 rows=12 width=24) (actual time=31413.071..33531.931 rows=15.00 loops=1)
          Workers Planned: 2
          Workers Launched: 2
-         Buffers: shared hit=14 read=2773065, temp read=231388 written=234005
-         ->  Partial GroupAggregate  (cost=3931502.25..3931551.95 rows=5 width=24) (actual time=90456.526..90550.029 rows=5.00 loops=3)
+         Buffers: shared hit=14 read=1386331, temp read=115471 written=116644
+         ->  Partial GroupAggregate  (cost=1965862.40..1965916.14 rows=5 width=24) (actual time=31349.789..31386.792 rows=5.00 loops=3)
                Group Key: orders.o_orderpriority
-               Buffers: shared hit=14 read=2773065, temp read=231388 written=234005
-               ->  Sort  (cost=3931502.25..3931518.80 rows=6620 width=16) (actual time=90447.114..90529.536 rows=350426.33 loops=3)
+               Buffers: shared hit=14 read=1386331, temp read=115471 written=116644
+               ->  Sort  (cost=1965862.40..1965880.29 rows=7159 width=16) (actual time=31345.087..31375.714 rows=175346.67 loops=3)
                      Sort Key: orders.o_orderpriority
-                     Sort Method: external merge  Disk: 6864kB
-                     Buffers: shared hit=14 read=2773065, temp read=231388 written=234005
-                     Worker 0:  Sort Method: external merge  Disk: 6888kB
-                     Worker 1:  Sort Method: external merge  Disk: 6856kB
-                     ->  Parallel Hash Semi Join  (cost=3149009.73..3931082.13 rows=6620 width=16) (actual time=76716.389..90235.961 rows=350426.33 loops=3)
+                     Sort Method: external merge  Disk: 3448kB
+                     Buffers: shared hit=14 read=1386331, temp read=115471 written=116644
+                     Worker 0:  Sort Method: external merge  Disk: 3432kB
+                     Worker 1:  Sort Method: external merge  Disk: 3440kB
+                     ->  Parallel Hash Semi Join  (cost=1574174.75..1965404.02 rows=7159 width=16) (actual time=25184.493..31223.766 rows=175346.67 loops=3)
                            Hash Cond: (orders.o_orderkey = lineitem.l_orderkey)
-                           Buffers: shared read=2773065, temp read=228812 written=231424
-                           ->  Parallel Seq Scan on orders  (cost=0.00..709940.62 rows=484515 width=20) (actual time=1.896..13135.693 rows=382118.67 loops=3)
+                           Buffers: shared read=1386331, temp read=114181 written=115352
+                           ->  Parallel Seq Scan on orders  (cost=0.00..354951.15 rows=254297 width=20) (actual time=1.243..3441.126 rows=191223.67 loops=3)
                                  Filter: ((o_orderdate >= '1993-07-01'::date) AND (o_orderdate < '1993-10-01 00:00:00'::timestamp without time zone))
-                                 Rows Removed by Filter: 9617881
-                                 Buffers: shared read=522433
-                           ->  Parallel Hash  (cost=2875590.29..2875590.29 rows=16665555 width=4) (actual time=60357.575..60357.576 rows=25289829.00 loops=3)
-                                 Buckets: 262144  Batches: 512  Memory Usage: 7936kB
-                                 Buffers: shared read=2250632, temp written=225252
-                                 ->  Parallel Seq Scan on lineitem  (cost=0.00..2875590.29 rows=16665555 width=4) (actual time=147.635..41207.167 rows=25289829.00 loops=3)
+                                 Rows Removed by Filter: 4808776
+                                 Buffers: shared read=261203
+                           ->  Parallel Hash  (cost=1437508.06..1437508.06 rows=8330135 width=4) (actual time=20184.583..20184.584 rows=12643116.00 loops=3)
+                                 Buckets: 262144  Batches: 256  Memory Usage: 7936kB
+                                 Buffers: shared read=1125128, temp written=112252
+                                 ->  Parallel Seq Scan on lineitem  (cost=0.00..1437508.06 rows=8330135 width=4) (actual time=144.529..8073.337 rows=12643116.00 loops=3)
                                        Filter: (l_commitdate < l_receiptdate)
-                                       Rows Removed by Filter: 14708374
-                                       Buffers: shared read=2250632
+                                       Rows Removed by Filter: 7352235
+                                       Buffers: shared read=1125128
  Planning:
    Buffers: shared hit=147 read=27
- Planning Time: 32.546 ms
+ Planning Time: 19.875 ms
  JIT:
    Functions: 54
    Options: Inlining true, Optimization true, Expressions true, Deforming true
-   Timing: Generation 3.327 ms (Deform 0.787 ms), Inlining 155.454 ms, Optimization 125.345 ms, Emission 159.510 ms, Total 443.636 ms
- Execution Time: 95031.585 ms
+   Timing: Generation 3.166 ms (Deform 0.838 ms), Inlining 162.070 ms, Optimization 123.960 ms, Emission 145.767 ms, Total 434.964 ms
+ Execution Time: 33742.091 ms
 (38 rows)
 

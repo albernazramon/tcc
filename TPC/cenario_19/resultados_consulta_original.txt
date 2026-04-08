@@ -1,36 +1,36 @@
                                                                                                                                                                                                                                                                                                                                                                            QUERY PLAN                                                                                                                                                                                                                                                                                                                                                                           
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- Finalize Aggregate  (cost=3907851.02..3907851.03 rows=1 width=32) (actual time=88109.932..88131.582 rows=1.00 loops=1)
-   Buffers: shared read=2332550
-   ->  Gather  (cost=3907850.80..3907851.01 rows=2 width=32) (actual time=88108.547..88131.552 rows=3.00 loops=1)
+ Finalize Aggregate  (cost=1954023.41..1954023.42 rows=1 width=32) (actual time=16761.609..16779.917 rows=1.00 loops=1)
+   Buffers: shared read=1166089
+   ->  Gather  (cost=1954023.19..1954023.40 rows=2 width=32) (actual time=16761.576..16779.889 rows=3.00 loops=1)
          Workers Planned: 2
          Workers Launched: 2
-         Buffers: shared read=2332550
-         ->  Partial Aggregate  (cost=3906850.80..3906850.81 rows=1 width=32) (actual time=88067.519..88067.522 rows=1.00 loops=3)
-               Buffers: shared read=2332550
-               ->  Parallel Hash Join  (cost=152799.34..3906843.84 rows=927 width=12) (actual time=3719.541..88063.309 rows=786.00 loops=3)
+         Buffers: shared read=1166089
+         ->  Partial Aggregate  (cost=1953023.19..1953023.20 rows=1 width=32) (actual time=16733.208..16733.211 rows=1.00 loops=3)
+               Buffers: shared read=1166089
+               ->  Parallel Hash Join  (cost=76401.32..1953019.85 rows=445 width=12) (actual time=916.020..16731.801 rows=378.00 loops=3)
                      Hash Cond: (lineitem.l_partkey = part.p_partkey)
                      Join Filter: (((part.p_brand = 'Brand#12'::bpchar) AND (part.p_container = ANY ('{"SM CASE","SM BOX","SM PACK","SM PKG"}'::bpchar[])) AND (lineitem.l_quantity >= '1'::numeric) AND (lineitem.l_quantity <= '11'::numeric) AND (part.p_size <= 5)) OR ((part.p_brand = 'Brand#23'::bpchar) AND (part.p_container = ANY ('{"MED BAG","MED BOX","MED PKG","MED PACK"}'::bpchar[])) AND (lineitem.l_quantity >= '10'::numeric) AND (lineitem.l_quantity <= '20'::numeric) AND (part.p_size <= 10)) OR ((part.p_brand = 'Brand#34'::bpchar) AND (part.p_container = ANY ('{"LG CASE","LG BOX","LG PACK","LG PKG"}'::bpchar[])) AND (lineitem.l_quantity >= '20'::numeric) AND (lineitem.l_quantity <= '30'::numeric) AND (part.p_size <= 15)))
-                     Rows Removed by Join Filter: 1342
-                     Buffers: shared read=2332550
-                     ->  Parallel Seq Scan on lineitem  (cost=0.00..3750531.90 rows=923128 width=21) (actual time=2.779..84019.613 rows=856646.00 loops=3)
+                     Rows Removed by Join Filter: 639
+                     Buffers: shared read=1166089
+                     ->  Parallel Seq Scan on lineitem  (cost=0.00..1874840.15 rows=467735 width=21) (actual time=1.132..15775.792 rows=428114.67 loops=3)
                            Filter: ((l_shipmode = ANY ('{AIR,"AIR REG"}'::bpchar[])) AND (l_shipinstruct = 'DELIVER IN PERSON'::bpchar) AND (((l_quantity >= '1'::numeric) AND (l_quantity <= '11'::numeric)) OR ((l_quantity >= '10'::numeric) AND (l_quantity <= '20'::numeric)) OR ((l_quantity >= '20'::numeric) AND (l_quantity <= '30'::numeric))))
-                           Rows Removed by Filter: 39141557
-                           Buffers: shared read=2250632
-                     ->  Parallel Hash  (cost=152749.23..152749.23 rows=4009 width=30) (actual time=3678.313..3678.314 rows=3225.33 loops=3)
-                           Buckets: 16384  Batches: 1  Memory Usage: 800kB
-                           Buffers: shared read=81918
-                           ->  Parallel Seq Scan on part  (cost=0.00..152749.23 rows=4009 width=30) (actual time=394.160..3670.232 rows=3225.33 loops=3)
+                           Rows Removed by Filter: 19567236
+                           Buffers: shared read=1125128
+                     ->  Parallel Hash  (cost=76377.01..76377.01 rows=1945 width=30) (actual time=849.233..849.233 rows=1584.67 loops=3)
+                           Buckets: 8192  Batches: 1  Memory Usage: 448kB
+                           Buffers: shared read=40961
+                           ->  Parallel Seq Scan on part  (cost=0.00..76377.01 rows=1945 width=30) (actual time=263.141..847.590 rows=1584.67 loops=3)
                                  Filter: ((p_size >= 1) AND (((p_brand = 'Brand#12'::bpchar) AND (p_container = ANY ('{"SM CASE","SM BOX","SM PACK","SM PKG"}'::bpchar[])) AND (p_size <= 5)) OR ((p_brand = 'Brand#23'::bpchar) AND (p_container = ANY ('{"MED BAG","MED BOX","MED PKG","MED PACK"}'::bpchar[])) AND (p_size <= 10)) OR ((p_brand = 'Brand#34'::bpchar) AND (p_container = ANY ('{"LG CASE","LG BOX","LG PACK","LG PKG"}'::bpchar[])) AND (p_size <= 15))))
-                                 Rows Removed by Filter: 1330108
-                                 Buffers: shared read=81918
+                                 Rows Removed by Filter: 665082
+                                 Buffers: shared read=40961
  Planning:
    Buffers: shared hit=158 read=32
- Planning Time: 50.320 ms
+ Planning Time: 22.335 ms
  JIT:
    Functions: 59
    Options: Inlining true, Optimization true, Expressions true, Deforming true
-   Timing: Generation 11.013 ms (Deform 3.200 ms), Inlining 334.540 ms, Optimization 447.852 ms, Emission 396.644 ms, Total 1190.050 ms
- Execution Time: 88375.495 ms
+   Timing: Generation 5.812 ms (Deform 1.763 ms), Inlining 188.274 ms, Optimization 357.139 ms, Emission 240.368 ms, Total 791.593 ms
+ Execution Time: 16988.139 ms
 (32 rows)
 

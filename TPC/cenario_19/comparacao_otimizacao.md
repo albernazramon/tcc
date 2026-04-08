@@ -112,18 +112,13 @@ FROM (
 
 | Métrica                    | Pré-Otimização | Pós-Otimização | Diferença / Impacto |
 | :------------------------- | :------------- | :------------- | :------------------ |
-| **Tempo de Execução**      | 88.375,49 ms   |                |                     |
-| **Custo Inicial Estimado** | 3.907.851,02   |                |                     |
-| **Custo Total Estimado**   | 3.907.851,03   |                |                     |
-| **Linhas**                 | 1              |                |                     |
-| **Memória: Hit**           | -              |                |                     |
-| **Memória: Read**          | 2.332.550      |                |                     |
-| **Memória: Dirtied**       | -              |                |                     |
-| **Memória: Written**       | -              |                |                     |
-| **Temp Read**              | -              |                |                     |
-| **Temp Written**           | -              |                |                     |
-
-### Resultados da Consulta (Registros)
-
-- **Pré-Otimização:** [resultados_consulta_original](.\resultados_consulta_original.csv)
-- **Pós-Otimização:** [resultados_consulta_otimizada](.\resultados_consulta_otimizada.csv)
+| **Tempo de Execução**      | 16.988,14 ms   | 1.403,62 ms    |                     |
+| **Custo Inicial Estimado** | 1.954.023,41   | 84.713,74      |                     |
+| **Custo Total Estimado**   | 1.954.023,42   | 84.713,75      |                     |
+| **Linhas**                 | 1              | 1              |                     |
+| **Memória: Hit**           | -              | 917.721        |                     |
+| **Memória: Read**          | 1.166.089      | 15.874         |                     |
+| **Memória: Dirtied**       | -              | -              |                     |
+| **Memória: Written**       | -              | -              |                     |
+| **Temp Read**              | -              | -              |                     |
+| **Temp Written**           | -              | -              |                     |

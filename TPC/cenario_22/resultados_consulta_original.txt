@@ -1,50 +1,50 @@
-                                                                              QUERY PLAN                                                                              
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
- GroupAggregate  (cost=906944.78..909044.56 rows=14843 width=72) (actual time=55414.494..55819.635 rows=7.00 loops=1)
+                                                                            QUERY PLAN                                                                            
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=454445.58..455530.06 rows=7666 width=72) (actual time=4501.912..4516.302 rows=7.00 loops=1)
    Group Key: (SUBSTRING(customer.c_phone FROM 1 FOR 2))
-   Buffers: shared hit=304 read=665835, temp read=477283 written=477344
+   Buffers: shared hit=304 read=332769
    InitPlan 1
-     ->  Finalize Aggregate  (cost=105759.52..105759.53 rows=1 width=32) (actual time=1993.679..1993.759 rows=1.00 loops=1)
-           Buffers: shared hit=6 read=71842
-           ->  Gather  (cost=105759.30..105759.51 rows=2 width=32) (actual time=1993.030..1993.736 rows=3.00 loops=1)
+     ->  Finalize Aggregate  (cost=53379.85..53379.86 rows=1 width=32) (actual time=491.606..491.655 rows=1.00 loops=1)
+           Buffers: shared hit=6 read=35924
+           ->  Gather  (cost=53379.62..53379.83 rows=2 width=32) (actual time=491.380..491.628 rows=3.00 loops=1)
                  Workers Planned: 2
                  Workers Launched: 2
-                 Buffers: shared hit=6 read=71842
-                 ->  Partial Aggregate  (cost=104759.30..104759.31 rows=1 width=32) (actual time=1969.072..1969.073 rows=1.00 loops=3)
-                       Buffers: shared hit=6 read=71842
-                       ->  Parallel Seq Scan on customer customer_1  (cost=0.00..104659.82 rows=39792 width=6) (actual time=127.290..1949.886 rows=254623.67 loops=3)
+                 Buffers: shared hit=6 read=35924
+                 ->  Partial Aggregate  (cost=52379.62..52379.63 rows=1 width=32) (actual time=465.350..465.351 rows=1.00 loops=3)
+                       Buffers: shared hit=6 read=35924
+                       ->  Parallel Seq Scan on customer customer_1  (cost=0.00..52330.03 rows=19836 width=6) (actual time=7.519..455.009 rows=127258.67 loops=3)
                              Filter: ((c_acctbal > 0.00) AND (SUBSTRING(c_phone FROM 1 FOR 2) = ANY ('{13,31,23,29,30,18,17}'::text[])))
-                             Rows Removed by Filter: 745376
-                             Buffers: shared hit=6 read=71842
-   ->  Gather Merge  (cost=801185.24..802913.96 rows=14843 width=38) (actual time=55410.540..55808.252 rows=127663.00 loops=1)
+                             Rows Removed by Filter: 372741
+                             Buffers: shared hit=6 read=35924
+   ->  Gather Merge  (cost=401065.72..401958.55 rows=7666 width=38) (actual time=4500.088..4509.485 rows=63914.00 loops=1)
          Workers Planned: 2
          Workers Launched: 2
-         Buffers: shared hit=304 read=665835, temp read=477283 written=477344
-         ->  Sort  (cost=800185.22..800200.68 rows=6185 width=38) (actual time=53382.392..53384.297 rows=42554.33 loops=3)
+         Buffers: shared hit=304 read=332769
+         ->  Sort  (cost=400065.70..400073.68 rows=3194 width=38) (actual time=3957.036..3957.787 rows=21304.67 loops=3)
                Sort Key: (SUBSTRING(customer.c_phone FROM 1 FOR 2))
-               Sort Method: quicksort  Memory: 3021kB
-               Buffers: shared hit=298 read=593993, temp read=477283 written=477344
-               Worker 0:  Sort Method: quicksort  Memory: 1769kB
-               Worker 1:  Sort Method: quicksort  Memory: 3031kB
-               ->  Parallel Hash Right Anti Join  (cost=104842.14..799795.73 rows=6185 width=38) (actual time=40058.967..53374.118 rows=42554.33 loops=3)
+               Sort Method: quicksort  Memory: 3529kB
+               Buffers: shared hit=298 read=296845
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Parallel Hash Right Anti Join  (cost=52421.18..399879.79 rows=3194 width=38) (actual time=3945.688..3953.418 rows=21304.67 loops=3)
                      Hash Cond: (orders.o_custkey = customer.c_custkey)
-                     Buffers: shared hit=282 read=593993, temp read=477283 written=477344
-                     ->  Parallel Seq Scan on orders  (cost=0.00..647438.08 rows=12500508 width=4) (actual time=1.665..844.409 rows=10000000.00 loops=3)
-                           Buffers: shared read=522433
-                     ->  Parallel Hash  (cost=104659.82..104659.82 rows=14586 width=26) (actual time=1055.438..1055.439 rows=127294.33 loops=3)
-                           Buckets: 131072 (originally 65536)  Batches: 8 (originally 1)  Memory Usage: 4064kB
-                           Buffers: shared hit=282 read=71560, temp written=1992
-                           ->  Parallel Seq Scan on customer  (cost=0.00..104659.82 rows=14586 width=26) (actual time=95.799..848.407 rows=127294.33 loops=3)
+                     Buffers: shared hit=282 read=296845
+                     ->  Parallel Seq Scan on orders  (cost=0.00..323701.77 rows=6249877 width=4) (actual time=3.471..2550.707 rows=5000000.00 loops=3)
+                           Buffers: shared read=261203
+                     ->  Parallel Hash  (cost=52330.03..52330.03 rows=7292 width=26) (actual time=459.770..459.771 rows=63563.67 loops=3)
+                           Buckets: 262144 (originally 32768)  Batches: 1 (originally 1)  Memory Usage: 15840kB
+                           Buffers: shared hit=282 read=35642
+                           ->  Parallel Seq Scan on customer  (cost=0.00..52330.03 rows=7292 width=26) (actual time=5.787..433.904 rows=63563.67 loops=3)
                                  Filter: ((c_acctbal > (InitPlan 1).col1) AND (SUBSTRING(c_phone FROM 1 FOR 2) = ANY ('{13,31,23,29,30,18,17}'::text[])))
-                                 Rows Removed by Filter: 872706
-                                 Buffers: shared hit=282 read=71560
+                                 Rows Removed by Filter: 436436
+                                 Buffers: shared hit=282 read=35642
  Planning:
    Buffers: shared hit=156 read=29
- Planning Time: 13.787 ms
+ Planning Time: 11.236 ms
  JIT:
    Functions: 56
-   Options: Inlining true, Optimization true, Expressions true, Deforming true
-   Timing: Generation 2.690 ms (Deform 1.093 ms), Inlining 295.981 ms, Optimization 211.425 ms, Emission 155.144 ms, Total 665.240 ms
- Execution Time: 55849.599 ms
+   Options: Inlining false, Optimization false, Expressions true, Deforming true
+   Timing: Generation 2.785 ms (Deform 1.090 ms), Inlining 0.000 ms, Optimization 2.016 ms, Emission 32.469 ms, Total 37.271 ms
+ Execution Time: 4545.014 ms
 (46 rows)
 

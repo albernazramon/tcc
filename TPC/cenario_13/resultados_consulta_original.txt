@@ -1,46 +1,51 @@
-                                                                                 QUERY PLAN                                                                                  
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- Sort  (cost=3133582.20..3133582.70 rows=200 width=16) (actual time=46002.588..46319.792 rows=45.00 loops=1)
+                                                                                   QUERY PLAN                                                                                   
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=1558139.44..1558139.94 rows=200 width=16) (actual time=20720.142..20895.799 rows=46.00 loops=1)
    Sort Key: (count(*)) DESC, (count(orders.o_orderkey)) DESC
    Sort Method: quicksort  Memory: 26kB
-   Buffers: shared hit=3 read=594275, temp read=216736 written=325203
-   ->  HashAggregate  (cost=3133572.56..3133574.56 rows=200 width=16) (actual time=46002.492..46319.698 rows=45.00 loops=1)
+   Buffers: shared hit=17 read=297127, temp read=101072 written=140929
+   ->  HashAggregate  (cost=1558129.79..1558131.79 rows=200 width=16) (actual time=20720.073..20895.735 rows=46.00 loops=1)
          Group Key: count(orders.o_orderkey)
          Batches: 1  Memory Usage: 40kB
-         Buffers: shared read=594275, temp read=216736 written=325203
-         ->  Finalize HashAggregate  (cost=2988236.52..3088565.27 rows=3000486 width=12) (actual time=43081.967..46059.302 rows=3000000.00 loops=1)
+         Buffers: shared hit=14 read=297127, temp read=101072 written=140929
+         ->  Finalize GroupAggregate  (cost=1083356.80..1535630.09 rows=1499980 width=12) (actual time=19738.070..20761.018 rows=1500000.00 loops=1)
                Group Key: customer.c_custkey
-               Planned Partitions: 64  Batches: 65  Memory Usage: 8217kB  Disk Usage: 126696kB
-               Buffers: shared read=594275, temp read=216736 written=325203
-               ->  Gather  (cost=1680116.61..2526911.82 rows=7201166 width=12) (actual time=34083.150..39434.104 rows=3177779.00 loops=1)
+               Buffers: shared hit=14 read=297127, temp read=101072 written=140929
+               ->  Gather Merge  (cost=1083356.80..1502630.53 rows=3599952 width=12) (actual time=19738.032..20521.009 rows=1633239.00 loops=1)
                      Workers Planned: 2
                      Workers Launched: 2
-                     Buffers: shared read=594275, temp read=203086 written=297261
-                     ->  Partial HashAggregate  (cost=1679116.61..1805795.22 rows=3000486 width=12) (actual time=34064.691..39013.445 rows=1059259.67 loops=3)
-                           Group Key: customer.c_custkey
-                           Planned Partitions: 32  Batches: 33  Memory Usage: 8729kB  Disk Usage: 259512kB
-                           Buffers: shared read=594275, temp read=203086 written=297261
-                           Worker 0:  Batches: 33  Memory Usage: 8473kB  Disk Usage: 259704kB
-                           Worker 1:  Batches: 33  Memory Usage: 8473kB  Disk Usage: 259576kB
-                           ->  Parallel Hash Right Join  (cost=104855.55..983065.61 rows=12374240 width=8) (actual time=15826.388..23192.910 rows=10225398.67 loops=3)
-                                 Hash Cond: (orders.o_custkey = customer.c_custkey)
-                                 Buffers: shared read=594275, temp read=110062 written=110344
-                                 ->  Parallel Seq Scan on orders  (cost=0.00..678689.35 rows=12374240 width=8) (actual time=1.667..6346.925 rows=9892050.00 loops=3)
-                                       Filter: ((o_comment)::text !~~ '%special%requests%'::text)
-                                       Rows Removed by Filter: 107950
-                                       Buffers: shared read=522433
-                                 ->  Parallel Hash  (cost=84344.02..84344.02 rows=1250202 width=4) (actual time=2126.697..2126.698 rows=1000000.00 loops=3)
-                                       Buckets: 262144  Batches: 32  Memory Usage: 5760kB
-                                       Buffers: shared read=71842, temp written=8692
-                                       ->  Parallel Seq Scan on customer  (cost=0.00..84344.02 rows=1250202 width=4) (actual time=139.104..1395.572 rows=1000000.00 loops=3)
-                                             Buffers: shared read=71842
+                     Buffers: shared hit=14 read=297127, temp read=101072 written=140929
+                     ->  Sort  (cost=1082356.77..1086106.72 rows=1499980 width=12) (actual time=19681.698..19868.453 rows=544413.00 loops=3)
+                           Sort Key: customer.c_custkey
+                           Sort Method: external merge  Disk: 14288kB
+                           Buffers: shared hit=14 read=297127, temp read=101072 written=140929
+                           Worker 0:  Sort Method: external merge  Disk: 14592kB
+                           Worker 1:  Sort Method: external merge  Disk: 12704kB
+                           ->  Partial HashAggregate  (cost=839513.73..902847.49 rows=1499980 width=12) (actual time=16822.286..19237.918 rows=544413.00 loops=3)
+                                 Group Key: customer.c_custkey
+                                 Planned Partitions: 16  Batches: 17  Memory Usage: 8345kB  Disk Usage: 113336kB
+                                 Buffers: shared read=297127, temp read=95874 written=135710
+                                 Worker 0:  Batches: 17  Memory Usage: 8345kB  Disk Usage: 113232kB
+                                 Worker 1:  Batches: 17  Memory Usage: 8345kB  Disk Usage: 113328kB
+                                 ->  Parallel Hash Right Join  (cost=52428.32..491509.21 rows=6186747 width=8) (actual time=7097.123..11390.090 rows=5112534.67 loops=3)
+                                       Hash Cond: (orders.o_custkey = customer.c_custkey)
+                                       Buffers: shared read=297127, temp read=54900 written=55044
+                                       ->  Parallel Seq Scan on orders  (cost=0.00..339326.46 rows=6186747 width=8) (actual time=1.244..1236.879 rows=4945861.00 loops=3)
+                                             Filter: ((o_comment)::text !~~ '%special%requests%'::text)
+                                             Rows Removed by Filter: 54139
+                                             Buffers: shared read=261203
+                                       ->  Parallel Hash  (cost=42173.92..42173.92 rows=624992 width=4) (actual time=902.420..902.422 rows=500000.00 loops=3)
+                                             Buckets: 262144  Batches: 16  Memory Usage: 5760kB
+                                             Buffers: shared read=35924, temp written=4220
+                                             ->  Parallel Seq Scan on customer  (cost=0.00..42173.92 rows=624992 width=4) (actual time=145.404..373.130 rows=500000.00 loops=3)
+                                                   Buffers: shared read=35924
  Planning:
    Buffers: shared hit=103 read=26
- Planning Time: 22.328 ms
+ Planning Time: 16.687 ms
  JIT:
-   Functions: 83
+   Functions: 76
    Options: Inlining true, Optimization true, Expressions true, Deforming true
-   Timing: Generation 5.216 ms (Deform 1.248 ms), Inlining 178.462 ms, Optimization 158.777 ms, Emission 160.057 ms, Total 502.511 ms
- Execution Time: 46520.754 ms
-(42 rows)
+   Timing: Generation 4.408 ms (Deform 1.121 ms), Inlining 181.767 ms, Optimization 152.863 ms, Emission 167.786 ms, Total 506.824 ms
+ Execution Time: 21109.934 ms
+(47 rows)
 

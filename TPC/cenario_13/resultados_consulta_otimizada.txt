@@ -1,0 +1,53 @@
+                                                                                                         QUERY PLAN                                                                                                         
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=1546201.08..1546201.58 rows=200 width=16) (actual time=18259.710..18419.140 rows=46.00 loops=1)
+   Sort Key: (count(*)) DESC, (count(orders.o_orderkey)) DESC
+   Sort Method: quicksort  Memory: 26kB
+   Buffers: shared hit=45 read=265300, temp read=101419 written=141245
+   ->  HashAggregate  (cost=1546191.43..1546193.43 rows=200 width=16) (actual time=18259.605..18419.038 rows=46.00 loops=1)
+         Group Key: count(orders.o_orderkey)
+         Batches: 1  Memory Usage: 40kB
+         Buffers: shared hit=42 read=265300, temp read=101419 written=141245
+         ->  Finalize GroupAggregate  (cost=1071412.11..1523691.43 rows=1500000 width=12) (actual time=17363.427..18288.742 rows=1500000.00 loops=1)
+               Group Key: customer.c_custkey
+               Buffers: shared hit=42 read=265300, temp read=101419 written=141245
+               ->  Gather Merge  (cost=1071412.11..1490691.43 rows=3600000 width=12) (actual time=17363.392..18074.216 rows=1645057.00 loops=1)
+                     Workers Planned: 2
+                     Workers Launched: 2
+                     Buffers: shared hit=42 read=265300, temp read=101419 written=141245
+                     ->  Sort  (cost=1070412.08..1074162.08 rows=1500000 width=12) (actual time=17295.307..17476.787 rows=548352.33 loops=3)
+                           Sort Key: customer.c_custkey
+                           Sort Method: external merge  Disk: 13488kB
+                           Buffers: shared hit=42 read=265300, temp read=101419 written=141245
+                           Worker 0:  Sort Method: external merge  Disk: 14888kB
+                           Worker 1:  Sort Method: external merge  Disk: 13512kB
+                           ->  Partial HashAggregate  (cost=827565.69..890900.60 rows=1500000 width=12) (actual time=14721.485..16890.697 rows=548352.33 loops=3)
+                                 Group Key: customer.c_custkey
+                                 Planned Partitions: 16  Batches: 17  Memory Usage: 8345kB  Disk Usage: 113312kB
+                                 Buffers: shared hit=28 read=265300, temp read=96183 written=135987
+                                 Worker 0:  Batches: 17  Memory Usage: 8345kB  Disk Usage: 113384kB
+                                 Worker 1:  Batches: 17  Memory Usage: 8345kB  Disk Usage: 113376kB
+                                 ->  Parallel Hash Right Join  (cost=40468.93..479554.31 rows=6186869 width=8) (actual time=6486.151..9908.928 rows=5112534.67 loops=3)
+                                       Hash Cond: (orders.o_custkey = customer.c_custkey)
+                                       Buffers: shared hit=28 read=265300, temp read=54897 written=55016
+                                       ->  Parallel Seq Scan on orders  (cost=0.00..339328.00 rows=6186869 width=8) (actual time=1.431..1033.607 rows=4945861.00 loops=3)
+                                             Filter: ((o_comment)::text !~~ '%special%requests%'::text)
+                                             Rows Removed by Filter: 54139
+                                             Buffers: shared read=261203
+                                       ->  Parallel Hash  (cost=30214.43..30214.43 rows=625000 width=4) (actual time=1063.187..1063.188 rows=500000.00 loops=3)
+                                             Buckets: 262144  Batches: 16  Memory Usage: 5760kB
+                                             Buffers: shared hit=28 read=4097, temp written=4204
+                                             ->  Parallel Index Only Scan using idx_customer_custkey_nationkey on customer  (cost=0.43..30214.43 rows=625000 width=4) (actual time=147.816..749.345 rows=500000.00 loops=3)
+                                                   Heap Fetches: 0
+                                                   Index Searches: 1
+                                                   Buffers: shared hit=28 read=4097
+ Planning:
+   Buffers: shared hit=346 read=64 dirtied=2
+ Planning Time: 38.538 ms
+ JIT:
+   Functions: 73
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 4.192 ms (Deform 0.959 ms), Inlining 186.691 ms, Optimization 159.493 ms, Emission 154.926 ms, Total 505.302 ms
+ Execution Time: 18625.105 ms
+(49 rows)
+

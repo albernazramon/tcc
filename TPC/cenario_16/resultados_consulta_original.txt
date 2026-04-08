@@ -1,48 +1,48 @@
                                                                                          QUERY PLAN                                                                                          
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- Sort  (cost=845646.29..846099.70 rows=181363 width=44) (actual time=19717.550..19810.941 rows=27840.00 loops=1)
+ Sort  (cost=430509.92..430894.44 rows=153810 width=44) (actual time=7409.903..7466.068 rows=27840.00 loops=1)
    Sort Key: (count(DISTINCT partsupp.ps_suppkey)) DESC, part.p_brand, part.p_type, part.p_size
    Sort Method: quicksort  Memory: 2507kB
-   Buffers: shared hit=3394 read=441544, temp read=88885 written=88996
-   ->  GroupAggregate  (cost=672606.23..824223.07 rows=181363 width=44) (actual time=17848.911..19767.491 rows=27840.00 loops=1)
+   Buffers: shared hit=4465 read=218225, temp read=36610 written=36653
+   ->  GroupAggregate  (cost=335767.23..412526.58 rows=153810 width=44) (actual time=6490.702..7419.014 rows=27840.00 loops=1)
          Group Key: part.p_brand, part.p_type, part.p_size
-         Buffers: shared hit=3391 read=441544, temp read=88885 written=88996
-         ->  Gather Merge  (cost=672606.23..810564.15 rows=1184529 width=40) (actual time=17848.827..19578.787 rows=2372547.00 loops=1)
+         Buffers: shared hit=4462 read=218225, temp read=36610 written=36653
+         ->  Gather Merge  (cost=335767.23..405040.56 rows=594792 width=40) (actual time=6490.631..7313.826 rows=1186602.00 loops=1)
                Workers Planned: 2
                Workers Launched: 2
-               Buffers: shared hit=3391 read=441544, temp read=88885 written=88996
-               ->  Sort  (cost=671606.21..672840.09 rows=493554 width=40) (actual time=17756.756..18328.392 rows=790849.00 loops=3)
+               Buffers: shared hit=4462 read=218225, temp read=36610 written=36653
+               ->  Sort  (cost=334767.21..335386.78 rows=247830 width=40) (actual time=6454.183..6846.908 rows=395534.00 loops=3)
                      Sort Key: part.p_brand, part.p_type, part.p_size, partsupp.ps_suppkey
-                     Sort Method: external merge  Disk: 40360kB
-                     Buffers: shared hit=3391 read=441544, temp read=88885 written=88996
-                     Worker 0:  Sort Method: external merge  Disk: 39456kB
-                     Worker 1:  Sort Method: external merge  Disk: 41296kB
-                     ->  Parallel Hash Join  (cost=135537.84..611437.65 rows=493554 width=40) (actual time=11557.963..14236.673 rows=790849.00 loops=3)
+                     Sort Method: external merge  Disk: 20472kB
+                     Buffers: shared hit=4462 read=218225, temp read=36610 written=36653
+                     Worker 0:  Sort Method: external merge  Disk: 19936kB
+                     Worker 1:  Sort Method: external merge  Disk: 20208kB
+                     ->  Parallel Hash Join  (cost=67779.37..305783.39 rows=247830 width=40) (actual time=4021.503..5402.822 rows=395534.00 loops=3)
                            Hash Cond: (partsupp.ps_partkey = part.p_partkey)
-                           Buffers: shared hit=3347 read=441544, temp read=58633 written=58696
-                           ->  Parallel Seq Scan on partsupp  (cost=6940.05..440321.38 rows=3332533 width=8) (actual time=231.091..5496.739 rows=5330506.67 loops=3)
+                           Buffers: shared hit=4418 read=218225, temp read=29033 written=29052
+                           ->  Parallel Seq Scan on partsupp  (cost=3469.03..220194.37 rows=1667214 width=8) (actual time=48.782..595.734 rows=2665173.33 loops=3)
                                  Filter: (NOT (ANY (ps_suppkey = (hashed SubPlan 1).col1)))
-                                 Rows Removed by Filter: 2827
-                                 Buffers: shared hit=3347 read=359626
+                                 Rows Removed by Filter: 1493
+                                 Buffers: shared hit=4418 read=177264
                                  SubPlan 1
-                                   ->  Seq Scan on supplier  (cost=0.00..6940.00 rows=20 width=4) (actual time=15.537..221.717 rows=106.00 loops=3)
+                                   ->  Seq Scan on supplier  (cost=0.00..3469.00 rows=10 width=4) (actual time=2.702..43.970 rows=56.00 loops=3)
                                          Filter: ((s_comment)::text ~~ '%Customer%Complaints%'::text)
-                                         Rows Removed by Filter: 199894
-                                         Buffers: shared hit=3347 read=9558
-                           ->  Parallel Hash  (cost=123583.43..123583.43 rows=246829 width=40) (actual time=2277.011..2277.012 rows=197818.67 loops=3)
-                                 Buckets: 131072  Batches: 8  Memory Usage: 6624kB
-                                 Buffers: shared read=81918, temp written=3980
-                                 ->  Parallel Seq Scan on part  (cost=0.00..123583.43 rows=246829 width=40) (actual time=182.840..1979.872 rows=197818.67 loops=3)
+                                         Rows Removed by Filter: 99944
+                                         Buffers: shared hit=4418 read=2219
+                           ->  Parallel Hash  (cost=61793.95..61793.95 rows=123872 width=40) (actual time=657.164..657.166 rows=98941.33 loops=3)
+                                 Buckets: 131072  Batches: 4  Memory Usage: 6624kB
+                                 Buffers: shared read=40961, temp written=1704
+                                 ->  Parallel Seq Scan on part  (cost=0.00..61793.95 rows=123872 width=40) (actual time=21.790..479.611 rows=98941.33 loops=3)
                                        Filter: ((p_brand <> 'Brand#45'::bpchar) AND ((p_type)::text !~~ 'MEDIUM POLISHED%'::text) AND (p_size = ANY ('{49,14,23,45,19,3,36,9}'::integer[])))
-                                       Rows Removed by Filter: 1135515
-                                       Buffers: shared read=81918
+                                       Rows Removed by Filter: 567725
+                                       Buffers: shared read=40961
  Planning:
-   Buffers: shared hit=132 read=29
- Planning Time: 18.451 ms
+   Buffers: shared hit=133 read=28
+ Planning Time: 16.823 ms
  JIT:
    Functions: 99
-   Options: Inlining true, Optimization true, Expressions true, Deforming true
-   Timing: Generation 5.415 ms (Deform 1.555 ms), Inlining 183.308 ms, Optimization 222.006 ms, Emission 198.266 ms, Total 608.994 ms
- Execution Time: 20015.415 ms
+   Options: Inlining false, Optimization false, Expressions true, Deforming true
+   Timing: Generation 4.841 ms (Deform 1.412 ms), Inlining 0.000 ms, Optimization 5.850 ms, Emission 66.001 ms, Total 76.692 ms
+ Execution Time: 7660.406 ms
 (44 rows)
 

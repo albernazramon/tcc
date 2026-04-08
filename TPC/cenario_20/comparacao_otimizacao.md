@@ -99,22 +99,15 @@ ORDER BY
 
 ## Comparação de Desempenho
 
-X -> Não foi possível executar a consulta dentro do tempo limite estabelecido (20 minutos).
-
 | Métrica                    | Pré-Otimização | Pós-Otimização | Diferença / Impacto |
 | :------------------------- | :------------- | :------------- | :------------------ |
-| **Tempo de Execução**      | X              |                |                     |
-| **Custo Inicial Estimado** | X              |                |                     |
-| **Custo Total Estimado**   | X              |                |                     |
-| **Linhas**                 | X              |                |                     |
-| **Memória: Hit**           | X              |                |                     |
-| **Memória: Read**          | X              |                |                     |
-| **Memória: Dirtied**       | X              |                |                     |
-| **Memória: Written**       | X              |                |                     |
-| **Temp Read**              | X              |                |                     |
-| **Temp Written**           | X              |                |                     |
-
-### Resultados da Consulta (Registros)
-
-- **Pré-Otimização:** [resultados_consulta_original](.\resultados_consulta_original.csv)
-- **Pós-Otimização:** [resultados_consulta_otimizada](.\resultados_consulta_otimizada.csv)
+| **Tempo de Execução**      |                | 39.878,39 ms   |                     |
+| **Custo Inicial Estimado** |                | 2.837.379,77   |                     |
+| **Custo Total Estimado**   |                | 2.837.379,77   |                     |
+| **Linhas**                 |                | 1              |                     |
+| **Memória: Hit**           | -              | 7.281          |                     |
+| **Memória: Read**          | -              | 1.167.469      |                     |
+| **Memória: Dirtied**       | -              | -              |                     |
+| **Memória: Written**       | -              | 108.622        |                     |
+| **Temp Read**              | -              | 45.591         |                     |
+| **Temp Written**           | -              | -              |                     |

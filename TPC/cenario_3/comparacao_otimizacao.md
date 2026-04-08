@@ -85,16 +85,16 @@ limit 10;
 
 | Métrica                    | Pré-Otimização | Pós-Otimização | Diferença / Impacto |
 | :------------------------- | :------------- | :------------- | :------------------ |
-| **Tempo de Execução**      | 93.252,54 ms   |                |                     |
-| **Custo Inicial Estimado** | 5.559.505,19   |                |                     |
-| **Custo Total Estimado**   | 5.559.505,22   |                |                     |
-| **Linhas**                 | 10             |                |                     |
-| **Memória: Hit**           | 33             |                |                     |
-| **Memória: Read**          | 2.844.907      |                |                     |
-| **Memória: Dirtied**       | -              |                |                     |
-| **Memória: Written**       | -              |                |                     |
-| **Temp Read**              | 375.282        |                |                     |
-| **Temp Written**           | 375.577        |                |                     |
+| **Tempo de Execução**      | 34.135,71 ms   | 30.725,68 ms   |                     |
+| **Custo Inicial Estimado** | 2.759.642,72   | 2.759.651,02   |                     |
+| **Custo Total Estimado**   | 2.759.642,74   | 2.759.651,05   |                     |
+| **Linhas**                 | 10             | 10             |                     |
+| **Memória: Hit**           | 33             | 33             |                     |
+| **Memória: Read**          | 1.422.255      | 1.422.512      |                     |
+| **Memória: Dirtied**       | -              | -              |                     |
+| **Memória: Written**       | 154.827        | 154.823        |                     |
+| **Temp Read**              | 154.713        | 154.713        |                     |
+| **Temp Written**           | -              | -              |                     |
 
 ### Resultados da Consulta (Registros)
 

@@ -1,0 +1,46 @@
+                                                                                                         QUERY PLAN                                                                                                         
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=2434031.78..2434032.03 rows=100 width=71) (actual time=30068.658..30094.677 rows=100.00 loops=1)
+   Buffers: shared hit=2612 read=232524 written=3
+   ->  Sort  (cost=2434031.78..2434355.98 rows=129683 width=71) (actual time=29902.860..29928.873 rows=100.00 loops=1)
+         Sort Key: o.o_totalprice DESC, o.o_orderdate
+         Sort Method: top-N heapsort  Memory: 36kB
+         Buffers: shared hit=2612 read=232524 written=3
+         ->  Nested Loop  (cost=1001.45..2429075.38 rows=129683 width=71) (actual time=107.740..29927.438 rows=624.00 loops=1)
+               Buffers: shared hit=2606 read=232524 written=3
+               ->  Nested Loop  (cost=1001.02..2368684.95 rows=129683 width=52) (actual time=105.575..29419.271 rows=624.00 loops=1)
+                     Buffers: shared hit=1371 read=231263 written=3
+                     ->  Finalize GroupAggregate  (cost=1000.59..1727313.73 rows=129683 width=36) (actual time=104.026..29012.269 rows=624.00 loops=1)
+                           Group Key: lineitem.l_orderkey
+                           Filter: (sum(lineitem.l_quantity) > '300'::numeric)
+                           Rows Removed by Filter: 14999376
+                           Buffers: shared hit=266 read=229872 written=3
+                           ->  Gather Merge  (cost=1000.59..1714475.15 rows=933715 width=36) (actual time=101.625..22960.860 rows=15172451.00 loops=1)
+                                 Workers Planned: 2
+                                 Workers Launched: 2
+                                 Buffers: shared hit=266 read=229872 written=3
+                                 ->  Partial GroupAggregate  (cost=0.56..1605701.25 rows=389048 width=36) (actual time=41.452..22240.795 rows=5057483.67 loops=3)
+                                       Group Key: lineitem.l_orderkey
+                                       Buffers: shared hit=266 read=229872 written=3
+                                       ->  Parallel Index Only Scan using idx_lineitem_orderkey_quantity on lineitem  (cost=0.56..1475867.21 rows=24994188 width=9) (actual time=1.114..18771.371 rows=19995350.67 loops=3)
+                                             Heap Fetches: 0
+                                             Index Searches: 1
+                                             Buffers: shared hit=266 read=229872 written=3
+                     ->  Index Scan using idx_orders_o_orderkey on orders o  (cost=0.43..4.93 rows=1 width=20) (actual time=0.650..0.650 rows=1.00 loops=624)
+                           Index Cond: (o_orderkey = lineitem.l_orderkey)
+                           Index Searches: 624
+                           Buffers: shared hit=1105 read=1391
+               ->  Index Scan using idx_customer_custkey_nationkey on customer c  (cost=0.43..0.46 rows=1 width=23) (actual time=0.811..0.812 rows=1.00 loops=624)
+                     Index Cond: (c_custkey = o.o_custkey)
+                     Index Searches: 624
+                     Buffers: shared hit=1235 read=1261
+ Planning:
+   Buffers: shared hit=608 read=80 dirtied=2
+ Planning Time: 66.889 ms
+ JIT:
+   Functions: 24
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 1.258 ms (Deform 0.108 ms), Inlining 162.537 ms, Optimization 61.568 ms, Emission 62.692 ms, Total 288.055 ms
+ Execution Time: 30282.520 ms
+(42 rows)
+

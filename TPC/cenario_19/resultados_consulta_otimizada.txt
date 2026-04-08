@@ -1,0 +1,63 @@
+                                                                                                      QUERY PLAN                                                                                                       
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=84713.74..84713.75 rows=1 width=32) (actual time=1397.909..1403.495 rows=1.00 loops=1)
+   Buffers: shared hit=917721 read=15874
+   ->  Gather  (cost=84713.52..84713.73 rows=2 width=32) (actual time=817.210..1403.483 rows=3.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=917721 read=15874
+         ->  Partial Aggregate  (cost=83713.52..83713.53 rows=1 width=32) (actual time=993.966..993.970 rows=1.00 loops=3)
+               Buffers: shared hit=917721 read=15874
+               ->  Parallel Append  (cost=0.99..83712.38 rows=456 width=32) (actual time=11.458..993.767 rows=378.00 loops=3)
+                     Buffers: shared hit=917721 read=15874
+                     ->  Nested Loop  (cost=0.99..23865.43 rows=183 width=32) (actual time=10.529..1372.960 rows=171.00 loops=1)
+                           Buffers: shared hit=1823 read=6420
+                           ->  Index Only Scan using idx_part_brand_container_size_partkey on part p  (cost=0.43..54.43 rows=830 width=4) (actual time=1.543..5.970 rows=781.00 loops=1)
+                                 Index Cond: ((p_brand = 'Brand#12'::bpchar) AND (p_container = ANY ('{"SM CASE","SM BOX","SM PACK","SM PKG"}'::bpchar[])) AND (p_size >= 1) AND (p_size <= 5))
+                                 Heap Fetches: 0
+                                 Index Searches: 4
+                                 Buffers: shared hit=48 read=12
+                           ->  Index Scan using idx_lineitem_partkey_quantity on lineitem l  (cost=0.56..28.68 rows=1 width=16) (actual time=1.658..1.749 rows=0.22 loops=781)
+                                 Index Cond: ((l_partkey = p.p_partkey) AND (l_quantity >= '1'::numeric) AND (l_quantity <= '11'::numeric))
+                                 Filter: ((l_shipmode = ANY ('{AIR,"AIR REG"}'::bpchar[])) AND (l_shipinstruct = 'DELIVER IN PERSON'::bpchar))
+                                 Rows Removed by Filter: 6
+                                 Index Searches: 781
+                                 Buffers: shared hit=1775 read=6408
+                     ->  Hash Join  (cost=157.47..29939.87 rows=226 width=32) (actual time=7.398..433.892 rows=290.50 loops=2)
+                           Hash Cond: (l_1.l_partkey = p_1.p_partkey)
+                           Buffers: shared hit=458609 read=4941
+                           ->  Parallel Index Only Scan using idx_lineitem_ship_qty_partkey_covering on lineitem l_1  (cost=0.56..29038.74 rows=197555 width=16) (actual time=0.786..408.610 rows=235963.00 loops=2)
+                                 Index Cond: ((l_shipinstruct = 'DELIVER IN PERSON'::bpchar) AND (l_shipmode = ANY ('{AIR,"AIR REG"}'::bpchar[])) AND (l_quantity >= '20'::numeric) AND (l_quantity <= '30'::numeric))
+                                 Heap Fetches: 0
+                                 Index Searches: 2
+                                 Buffers: shared hit=458333 read=4920
+                           ->  Hash  (cost=126.51..126.51 rows=2432 width=4) (actual time=4.108..4.109 rows=2395.00 loops=2)
+                                 Buckets: 4096  Batches: 1  Memory Usage: 117kB
+                                 Buffers: shared hit=276 read=21
+                                 ->  Index Only Scan using idx_part_brand_container_size_partkey on part p_1  (cost=0.43..126.51 rows=2432 width=4) (actual time=0.857..3.827 rows=2395.00 loops=2)
+                                       Index Cond: ((p_brand = 'Brand#34'::bpchar) AND (p_container = ANY ('{"LG CASE","LG BOX","LG PACK","LG PKG"}'::bpchar[])) AND (p_size >= 1) AND (p_size <= 15))
+                                       Heap Fetches: 0
+                                       Index Searches: 8
+                                       Buffers: shared hit=276 read=21
+                     ->  Hash Join  (cost=112.50..29904.80 rows=154 width=32) (actual time=12.772..740.238 rows=382.00 loops=1)
+                           Hash Cond: (l_2.l_partkey = p_2.p_partkey)
+                           Buffers: shared hit=457289 read=4513
+                           ->  Parallel Index Only Scan using idx_lineitem_ship_qty_partkey_covering on lineitem l_2  (cost=0.56..29049.50 rows=197615 width=16) (actual time=0.692..694.323 rows=470301.00 loops=1)
+                                 Index Cond: ((l_shipinstruct = 'DELIVER IN PERSON'::bpchar) AND (l_shipmode = ANY ('{AIR,"AIR REG"}'::bpchar[])) AND (l_quantity >= '10'::numeric) AND (l_quantity <= '20'::numeric))
+                                 Heap Fetches: 0
+                                 Index Searches: 2
+                                 Buffers: shared hit=457204 read=4493
+                           ->  Hash  (cost=91.20..91.20 rows=1659 width=4) (actual time=4.347..4.347 rows=1578.00 loops=1)
+                                 Buckets: 2048  Batches: 1  Memory Usage: 72kB
+                                 Buffers: shared hit=85 read=20
+                                 ->  Index Only Scan using idx_part_brand_container_size_partkey on part p_2  (cost=0.43..91.20 rows=1659 width=4) (actual time=1.553..4.153 rows=1578.00 loops=1)
+                                       Index Cond: ((p_brand = 'Brand#23'::bpchar) AND (p_container = ANY ('{"MED BAG","MED BOX","MED PKG","MED PACK"}'::bpchar[])) AND (p_size >= 1) AND (p_size <= 10))
+                                       Heap Fetches: 0
+                                       Index Searches: 4
+                                       Buffers: shared hit=85 read=20
+ Planning:
+   Buffers: shared hit=697 read=84 dirtied=2
+ Planning Time: 74.932 ms
+ Execution Time: 1403.616 ms
+(59 rows)
+

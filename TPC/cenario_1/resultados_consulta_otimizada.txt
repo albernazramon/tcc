@@ -1,0 +1,35 @@
+                                                                           QUERY PLAN                                                                           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=2300468.18..2300470.43 rows=6 width=236) (actual time=16352.176..16367.439 rows=4.00 loops=1)
+   Group Key: l_returnflag, l_linestatus
+   Buffers: shared hit=14 read=1125128
+   ->  Gather Merge  (cost=2300468.18..2300469.81 rows=14 width=236) (actual time=16352.153..16367.400 rows=12.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=14 read=1125128
+         ->  Sort  (cost=2299468.16..2299468.17 rows=6 width=236) (actual time=16325.425..16325.426 rows=4.00 loops=3)
+               Sort Key: l_returnflag, l_linestatus
+               Sort Method: quicksort  Memory: 26kB
+               Buffers: shared hit=14 read=1125128
+               Worker 0:  Sort Method: quicksort  Memory: 26kB
+               Worker 1:  Sort Method: quicksort  Memory: 26kB
+               ->  Partial HashAggregate  (cost=2299467.94..2299468.08 rows=6 width=236) (actual time=16325.394..16325.401 rows=4.00 loops=3)
+                     Group Key: l_returnflag, l_linestatus
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared read=1125128
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on lineitem  (cost=0.00..1437555.35 rows=24626074 width=25) (actual time=216.674..2497.876 rows=19714203.00 loops=3)
+                           Filter: (l_shipdate <= '1998-09-02 00:00:00'::timestamp without time zone)
+                           Rows Removed by Filter: 281148
+                           Buffers: shared read=1125128
+ Planning:
+   Buffers: shared hit=118 read=36 dirtied=1
+ Planning Time: 25.143 ms
+ JIT:
+   Functions: 36
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 3.556 ms (Deform 1.174 ms), Inlining 180.835 ms, Optimization 244.806 ms, Emission 222.429 ms, Total 651.627 ms
+ Execution Time: 16561.318 ms
+(31 rows)
+

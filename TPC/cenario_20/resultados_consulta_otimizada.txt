@@ -1,0 +1,69 @@
+                                                                                QUERY PLAN                                                                                 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=2837379.77..2837379.77 rows=1 width=52) (actual time=39672.149..39672.312 rows=2377.00 loops=1)
+   Sort Key: s.s_name
+   Sort Method: quicksort  Memory: 262kB
+   Buffers: shared hit=7281 read=1167469, temp read=45591 written=108622
+   ->  Nested Loop  (cost=2658262.08..2837379.76 rows=1 width=52) (actual time=26994.368..39660.914 rows=2377.00 loops=1)
+         Join Filter: ((s.s_suppkey = ps.ps_suppkey) AND (ps.ps_partkey = p.p_partkey))
+         Buffers: shared hit=7278 read=1167469, temp read=45591 written=108622
+         ->  Hash Join  (cost=2658261.64..2836398.23 rows=1942 width=100) (actual time=26992.781..38646.739 rows=2384.00 loops=1)
+               Hash Cond: (lineitem.l_suppkey = s.s_suppkey)
+               Buffers: shared hit=136 read=1165471, temp read=45591 written=108622
+               ->  Hash Join  (cost=2655803.30..2833738.45 rows=48538 width=44) (actual time=26694.453..38329.269 rows=58782.00 loops=1)
+                     Hash Cond: (lineitem.l_partkey = p.p_partkey)
+                     Buffers: shared hit=136 read=1163589, temp read=45591 written=108622
+                     ->  HashAggregate  (cost=2620303.77..2779733.80 rows=4805263 width=40) (actual time=26055.374..36944.612 rows=5441669.00 loops=1)
+                           Group Key: lineitem.l_partkey, lineitem.l_suppkey
+                           Planned Partitions: 256  Batches: 257  Memory Usage: 8209kB  Disk Usage: 507304kB
+                           Buffers: shared read=1125128, temp read=45591 written=108622
+                           ->  Seq Scan on lineitem  (cost=0.00..2024918.78 rows=8944751 width=13) (actual time=0.568..5818.229 rows=9099165.00 loops=1)
+                                 Filter: ((l_shipdate >= '1994-01-01'::date) AND (l_shipdate < '1995-01-01'::date))
+                                 Rows Removed by Filter: 50886887
+                                 Buffers: shared read=1125128
+                     ->  Hash  (cost=35247.01..35247.01 rows=20202 width=4) (actual time=638.846..638.850 rows=21551.00 loops=1)
+                           Buckets: 32768  Batches: 1  Memory Usage: 1014kB
+                           Buffers: shared hit=136 read=38461
+                           ->  Bitmap Heap Scan on part p  (cost=751.35..35247.01 rows=20202 width=4) (actual time=87.956..632.934 rows=21551.00 loops=1)
+                                 Recheck Cond: ((p_name)::text ~~ 'forest%'::text)
+                                 Rows Removed by Index Recheck: 86992
+                                 Heap Blocks: exact=38299
+                                 Buffers: shared hit=136 read=38461
+                                 ->  Bitmap Index Scan on idx_part_p_name_trgm  (cost=0.00..746.30 rows=20202 width=0) (actual time=82.845..82.845 rows=108543.00 loops=1)
+                                       Index Cond: ((p_name)::text ~~ 'forest%'::text)
+                                       Index Searches: 1
+                                       Buffers: shared hit=136 read=162
+               ->  Hash  (cost=2408.34..2408.34 rows=4000 width=56) (actual time=295.981..295.984 rows=4054.00 loops=1)
+                     Buckets: 4096  Batches: 1  Memory Usage: 387kB
+                     Buffers: shared read=1882
+                     ->  Nested Loop  (cost=47.29..2408.34 rows=4000 width=56) (actual time=264.215..295.248 rows=4054.00 loops=1)
+                           Buffers: shared read=1882
+                           ->  Seq Scan on nation n  (cost=0.00..1.31 rows=1 width=4) (actual time=261.455..261.460 rows=1.00 loops=1)
+                                 Filter: (n_name = 'CANADA'::bpchar)
+                                 Rows Removed by Filter: 24
+                                 Buffers: shared read=1
+                           ->  Bitmap Heap Scan on supplier s  (cost=47.29..2367.03 rows=4000 width=60) (actual time=2.746..33.374 rows=4054.00 loops=1)
+                                 Recheck Cond: (s_nationkey = n.n_nationkey)
+                                 Heap Blocks: exact=1876
+                                 Buffers: shared read=1881
+                                 ->  Bitmap Index Scan on idx_supplier_s_nationkey  (cost=0.00..46.29 rows=4000 width=0) (actual time=1.975..1.975 rows=4054.00 loops=1)
+                                       Index Cond: (s_nationkey = n.n_nationkey)
+                                       Index Searches: 1
+                                       Buffers: shared read=5
+         ->  Index Only Scan using idx_partsupp_skey_pkey_include on partsupp ps  (cost=0.43..0.49 rows=1 width=12) (actual time=0.422..0.423 rows=1.00 loops=2384)
+               Index Cond: ((ps_suppkey = lineitem.l_suppkey) AND (ps_partkey = lineitem.l_partkey))
+               Filter: ((ps_availqty)::numeric > ((0.5 * sum(lineitem.l_quantity))))
+               Rows Removed by Filter: 0
+               Heap Fetches: 0
+               Index Searches: 2384
+               Buffers: shared hit=7142 read=1998
+ Planning:
+   Buffers: shared hit=970 read=116 dirtied=2
+ Planning Time: 90.988 ms
+ JIT:
+   Functions: 44
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 2.717 ms (Deform 0.774 ms), Inlining 78.188 ms, Optimization 130.394 ms, Emission 103.725 ms, Total 315.024 ms
+ Execution Time: 39878.386 ms
+(65 rows)
+

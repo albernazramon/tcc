@@ -81,18 +81,13 @@ ORDER BY
 
 | Métrica                    | Pré-Otimização | Pós-Otimização | Diferença / Impacto |
 | :------------------------- | :------------- | :------------- | :------------------ |
-| **Tempo de Execução**      | 14.794,15 ms   |                |                     |
-| **Custo Inicial Estimado** | 1.036.997,66   |                |                     |
-| **Custo Total Estimado**   | 1.037.414,47   |                |                     |
-| **Linhas**                 | 166.725        |                |                     |
-| **Memória: Hit**           | 586            |                |                     |
-| **Memória: Read**          | 708.453        |                |                     |
-| **Memória: Dirtied**       | -              |                |                     |
-| **Memória: Written**       | -              |                |                     |
-| **Temp Read**              | 2.062          |                |                     |
-| **Temp Written**           | 2.068          |                |                     |
-
-### Resultados da Consulta (Registros)
-
-- **Pré-Otimização:** [resultados_consulta_original](.\resultados_consulta_original.csv)
-- **Pós-Otimização:** [resultados_consulta_otimizada](.\resultados_consulta_otimizada.csv)
+| **Tempo de Execução**      | 5.660,34 ms    | 1.972,44 ms    |                     |
+| **Custo Inicial Estimado** | 522.538,02     | 67.089,77      |                     |
+| **Custo Total Estimado**   | 522.802,17     | 67.356,44      |                     |
+| **Linhas**                 | 105662         | 106667         |                     |
+| **Memória: Hit**           | 2.521          | 32.538         |                     |
+| **Memória: Read**          | 352.028        | 5.542          |                     |
+| **Memória: Dirtied**       | -              | -              |                     |
+| **Memória: Written**       | 1.037          | 3.955          |                     |
+| **Temp Read**              | 1.034          | 2.791          |                     |
+| **Temp Written**           | -              | -              |                     |

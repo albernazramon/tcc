@@ -139,16 +139,16 @@ X -> Não foi possível executar a consulta dentro do tempo limite estabelecido 
 
 | Métrica                    | Pré-Otimização | Pós-Otimização | Diferença / Impacto |
 | :------------------------- | :------------- | :------------- | :------------------ |
-| **Tempo de Execução**      | X              |                |                     |
-| **Custo Inicial Estimado** | X              |                |                     |
-| **Custo Total Estimado**   | X              |                |                     |
-| **Linhas**                 | X              |                |                     |
-| **Memória: Hit**           | X              |                |                     |
-| **Memória: Read**          | X              |                |                     |
-| **Memória: Dirtied**       | X              |                |                     |
-| **Memória: Written**       | X              |                |                     |
-| **Temp Read**              | X              |                |                     |
-| **Temp Written**           | X              |                |                     |
+| **Tempo de Execução**      | X              | 8.720,13 ms    |                     |
+| **Custo Inicial Estimado** | X              | 460.702,29     |                     |
+| **Custo Total Estimado**   | X              | 460.703,48     |                     |
+| **Linhas**                 | X              | 1              |                     |
+| **Memória: Hit**           | X              | 62.239         |                     |
+| **Memória: Read**          | X              | 366.046        |                     |
+| **Memória: Dirtied**       | X              | -              |                     |
+| **Memória: Written**       | X              | 22.712         |                     |
+| **Temp Read**              | X              | 11.538         |                     |
+| **Temp Written**           | X              | -              |                     |
 
 ### Resultados da Consulta (Registros)
 

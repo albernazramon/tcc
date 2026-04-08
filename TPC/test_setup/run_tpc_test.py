@@ -82,6 +82,9 @@ def clear_all_caches():
 
 def execute_sql_file(file_path, scenario_num, query_name, is_pre_script=False):
     if not os.path.exists(file_path):
+        if is_pre_script:
+            print(f"[INFO] Script pré-consulta não encontrado (pulando): {file_path}")
+            return True
         print(f"[ERRO] Arquivo não encontrado: {file_path}")
         return False
 
@@ -89,6 +92,9 @@ def execute_sql_file(file_path, scenario_num, query_name, is_pre_script=False):
         query_content = f.read().strip()
 
     if not query_content:
+        if is_pre_script:
+            print(f"[INFO] Script pré-consulta vazio (pulando): {file_path}")
+            return True
         print(f"[ERRO] Arquivo vazio: {file_path}")
         return False
 

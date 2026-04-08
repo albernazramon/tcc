@@ -1,0 +1,42 @@
+                                                                                     QUERY PLAN                                                                                      
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=67089.77..67356.44 rows=106667 width=36) (actual time=1968.795..1968.799 rows=0.00 loops=1)
+   Sort Key: grouped_values_with_total.value DESC
+   Sort Method: quicksort  Memory: 25kB
+   Buffers: shared hit=32538 read=5542, temp read=2791 written=3955
+   ->  Subquery Scan on grouped_values_with_total  (cost=50462.57..55262.60 rows=106667 width=36) (actual time=1968.773..1968.776 rows=0.00 loops=1)
+         Filter: (grouped_values_with_total.value > (grouped_values_with_total.total_germany_value * 0.0001000000))
+         Rows Removed by Filter: 304774
+         Buffers: shared hit=32535 read=5542, temp read=2791 written=3955
+         ->  WindowAgg  (cost=50462.57..50462.60 rows=320000 width=68) (actual time=1803.155..1925.853 rows=304774.00 loops=1)
+               Window: w1 AS ()
+               Storage: Disk  Maximum Storage: 6812kB
+               Buffers: shared hit=32535 read=5542, temp read=2791 written=3955
+               ->  HashAggregate  (cost=39337.60..46462.60 rows=320000 width=36) (actual time=1220.577..1579.579 rows=304774.00 loops=1)
+                     Group Key: partsupp.ps_partkey
+                     Planned Partitions: 16  Batches: 17  Memory Usage: 8337kB  Disk Usage: 15064kB
+                     Buffers: shared hit=32535 read=5542, temp read=1330 written=3102
+                     ->  Nested Loop  (cost=0.72..17237.60 rows=320000 width=14) (actual time=1.608..746.033 rows=323920.00 loops=1)
+                           Buffers: shared hit=32535 read=5542
+                           ->  Nested Loop  (cost=0.29..159.60 rows=4000 width=4) (actual time=1.466..4.173 rows=4049.00 loops=1)
+                                 Buffers: shared read=15
+                                 ->  Seq Scan on nation  (cost=0.00..1.31 rows=1 width=4) (actual time=0.499..0.504 rows=1.00 loops=1)
+                                       Filter: (n_name = 'GERMANY'::bpchar)
+                                       Rows Removed by Filter: 24
+                                       Buffers: shared read=1
+                                 ->  Index Only Scan using idx_supplier_nkey_skey on supplier  (cost=0.29..118.29 rows=4000 width=8) (actual time=0.966..3.092 rows=4049.00 loops=1)
+                                       Index Cond: (s_nationkey = nation.n_nationkey)
+                                       Heap Fetches: 0
+                                       Index Searches: 1
+                                       Buffers: shared read=14
+                           ->  Index Only Scan using idx_partsupp_skey_pkey_include on partsupp  (cost=0.43..3.45 rows=82 width=18) (actual time=0.120..0.175 rows=80.00 loops=4049)
+                                 Index Cond: (ps_suppkey = supplier.s_suppkey)
+                                 Heap Fetches: 0
+                                 Index Searches: 4049
+                                 Buffers: shared hit=32535 read=5527
+ Planning:
+   Buffers: shared hit=269 read=52 dirtied=2
+ Planning Time: 26.219 ms
+ Execution Time: 1972.438 ms
+(38 rows)
+

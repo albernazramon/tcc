@@ -1,24 +1,24 @@
                                                                                                         QUERY PLAN                                                                                                         
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- Finalize Aggregate  (cost=3381417.81..3381417.82 rows=1 width=32) (actual time=57684.794..57701.082 rows=1.00 loops=1)
-   Buffers: shared read=2250632
-   ->  Gather  (cost=3381417.59..3381417.80 rows=2 width=32) (actual time=57684.774..57701.064 rows=3.00 loops=1)
+ Finalize Aggregate  (cost=1690714.70..1690714.71 rows=1 width=32) (actual time=15241.474..15257.294 rows=1.00 loops=1)
+   Buffers: shared read=1125128
+   ->  Gather  (cost=1690714.48..1690714.69 rows=2 width=32) (actual time=15241.223..15257.274 rows=3.00 loops=1)
          Workers Planned: 2
          Workers Launched: 2
-         Buffers: shared read=2250632
-         ->  Partial Aggregate  (cost=3380417.59..3380417.60 rows=1 width=32) (actual time=57657.020..57657.021 rows=1.00 loops=3)
-               Buffers: shared read=2250632
-               ->  Parallel Seq Scan on lineitem  (cost=0.00..3375556.92 rows=972133 width=12) (actual time=153.842..57496.153 rows=760373.00 loops=3)
+         Buffers: shared read=1125128
+         ->  Partial Aggregate  (cost=1689714.48..1689714.49 rows=1 width=32) (actual time=15212.897..15212.898 rows=1.00 loops=3)
+               Buffers: shared read=1125128
+               ->  Parallel Seq Scan on lineitem  (cost=0.00..1687412.11 rows=460473 width=12) (actual time=158.538..15133.811 rows=379754.67 loops=3)
                      Filter: ((l_shipdate >= '1994-01-01'::date) AND (l_shipdate < '1995-01-01 00:00:00'::timestamp without time zone) AND (l_discount >= 0.05) AND (l_discount <= 0.07) AND (l_quantity < '24'::numeric))
-                     Rows Removed by Filter: 39237830
-                     Buffers: shared read=2250632
+                     Rows Removed by Filter: 19615596
+                     Buffers: shared read=1125128
  Planning:
    Buffers: shared hit=40 read=19
- Planning Time: 23.431 ms
+ Planning Time: 15.542 ms
  JIT:
    Functions: 17
    Options: Inlining true, Optimization true, Expressions true, Deforming true
-   Timing: Generation 2.083 ms (Deform 0.670 ms), Inlining 200.525 ms, Optimization 125.733 ms, Emission 130.856 ms, Total 459.197 ms
- Execution Time: 57891.581 ms
+   Timing: Generation 2.140 ms (Deform 0.676 ms), Inlining 201.829 ms, Optimization 135.670 ms, Emission 135.224 ms, Total 474.863 ms
+ Execution Time: 15480.943 ms
 (20 rows)
 

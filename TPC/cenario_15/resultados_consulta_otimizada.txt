@@ -1,0 +1,53 @@
+                                                                             QUERY PLAN                                                                              
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=1619241.09..1624426.91 rows=492 width=104) (actual time=16335.647..16347.464 rows=1.00 loops=1)
+   Buffers: shared hit=14 read=1125131, temp read=12909 written=20840
+   CTE supplier_revenue
+     ->  Finalize GroupAggregate  (cost=1586540.53..1617028.12 rows=98341 width=36) (actual time=16028.540..16245.130 rows=100000.00 loops=1)
+           Group Key: lineitem.l_suppkey
+           Buffers: shared hit=14 read=1125128, temp read=12628 written=20559
+           ->  Gather Merge  (cost=1586540.53..1614028.72 rows=236018 width=36) (actual time=16028.495..16159.973 rows=299845.00 loops=1)
+                 Workers Planned: 2
+                 Workers Launched: 2
+                 Buffers: shared hit=14 read=1125128, temp read=12628 written=20559
+                 ->  Sort  (cost=1585540.51..1585786.36 rows=98341 width=36) (actual time=16000.457..16063.787 rows=99948.33 loops=3)
+                       Sort Key: lineitem.l_suppkey
+                       Sort Method: external merge  Disk: 7936kB
+                       Buffers: shared hit=14 read=1125128, temp read=12628 written=20559
+                       Worker 0:  Sort Method: external merge  Disk: 7936kB
+                       Worker 1:  Sort Method: external merge  Disk: 7944kB
+                       ->  Partial HashAggregate  (cost=1564368.47..1574693.84 rows=98341 width=36) (actual time=15135.880..15765.913 rows=99948.33 loops=3)
+                             Group Key: lineitem.l_suppkey
+                             Planned Partitions: 4  Batches: 5  Memory Usage: 8241kB  Disk Usage: 27712kB
+                             Buffers: shared read=1125128, temp read=9651 written=17576
+                             Worker 0:  Batches: 5  Memory Usage: 8241kB  Disk Usage: 27696kB
+                             Worker 1:  Batches: 5  Memory Usage: 8241kB  Disk Usage: 27720kB
+                             ->  Parallel Seq Scan on lineitem  (cost=0.00..1500040.82 rows=931441 width=16) (actual time=175.160..13220.340 rows=755238.00 loops=3)
+                                   Filter: ((l_shipdate >= '1996-01-01'::date) AND (l_shipdate < '1996-04-01'::date))
+                                   Rows Removed by Filter: 19240113
+                                   Buffers: shared read=1125128
+   InitPlan 2
+     ->  Aggregate  (cost=2212.67..2212.68 rows=1 width=32) (actual time=276.180..276.180 rows=1.00 loops=1)
+           Buffers: temp read=497 written=280
+           ->  CTE Scan on supplier_revenue  (cost=0.00..1966.82 rows=98341 width=32) (actual time=0.001..269.190 rows=100000.00 loops=1)
+                 Storage: Disk  Maximum Storage: 4096kB
+                 Buffers: temp read=497 written=280
+   ->  CTE Scan on supplier_revenue sr  (cost=0.00..2212.67 rows=492 width=36) (actual time=16335.212..16346.962 rows=1.00 loops=1)
+         Filter: (total_revenue = (InitPlan 2).col1)
+         Rows Removed by Filter: 99999
+         Storage: Disk  Maximum Storage: 4096kB
+         Buffers: shared read=375518, temp read=4483 written=7128
+   ->  Index Scan using idx_supplier_suppkey on supplier s  (cost=0.29..6.03 rows=1 width=72) (actual time=0.400..0.401 rows=1.00 loops=1)
+         Index Cond: (s_suppkey = sr.l_suppkey)
+         Index Searches: 1
+         Buffers: shared read=3
+ Planning:
+   Buffers: shared hit=458 read=56 dirtied=2
+ Planning Time: 44.654 ms
+ JIT:
+   Functions: 59
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 4.729 ms (Deform 1.856 ms), Inlining 214.481 ms, Optimization 284.209 ms, Emission 214.199 ms, Total 717.618 ms
+ Execution Time: 16554.105 ms
+(49 rows)
+
