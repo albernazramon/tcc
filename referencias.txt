@@ -1,0 +1,25 @@
+McKinsey Global Institute [MGI]. 2011. Big data: the next frontier for innovation, competition, and productivity. Disponível em: <https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/big-data-the-next-frontier-for-innovation>. Acesso em: 21 set. 2025.
+
+International Business Machines [IBM]. 2025. O que é LLM (large language models)?. Disponível em: <https://www.ibm.com/br-pt/think/topics/large-language-models>. Acesso em: 21 set. 2025.
+
+Abbasi, M.; Bernardo, M.V.; Váz, P.; Silva, J.; Martins, P. 2024. Adaptive and Scalable Database Management with Machine Learning Integration: A PostgreSQL Case Study. Information 15(9): 574.
+
+Rauf, A.; Shorna, S.A.; Joy, Z.H.; Rahman, M. 2024. Data-driven transformation: Optimizing enterprise financial management and decisionmaking with Big Data. Academic Journal on Business Administration, Innovation & Sustainability 4(2): 94-106.
+
+Gupta, M.; Mittal, A.; Bisht, S.S.; Arora, S. 2024. Optimizing MySQL Performance: Essential Techniques, Resources, and Best Practices. In: International Conference on Progressive Innovations in Intelligent Systems and Data Science (ICPIDS), 2024, Pattaya, Tailândia. Anais... p. 484-489.
+
+Mehta, S.; Kaur, P.; Lodhi, P.; Mishra, O. 2018. Empirical Evidence of Heuristic and Cost Based Query Optimizations in Relational Databases. In: International Conference on Contemporary Computing (IC3), 2018, Noida, Índia. Anais... p. 1-3.
+
+Naha, K.; Rubaiat, S. Y.; Jamil, H. M. 2025. Are Large Language Models Smart Enough for SQL Tutoring and Assessment?. In: IEEE International Conference on Advanced Learning Technologies (ICALT), 2025, Changhua, Taiwan. Anais... p. 357-359.
+
+JetBrains. 2024. State of Developer Ecosystem Report 2024. Disponível em: <https://www.jetbrains.com/lp/devecosystem-2024/>. Acesso em: 19 out. 2025.
+
+Stack Overflow. 2025. 2025 Developer Survey. Disponível em: <https://survey.stackoverflow.co/2025/technology#most-popular-technologies-language>. Acesso em: 19 out. 2025.
+
+Sommerville, I. 2011. Software Engineering. 9ed. Pearson Education do Brasil, São Paulo, SP, Brasil.
+
+Amazon Web Services [AWS]. 2025. O que é RAG (geração aumentada via recuperação)?. Disponível em: <https://aws.amazon.com/pt/what-is/retrieval-augmented-generation/>. Acesso em: 08 jan. 2026.
+
+Red Hat. 2024. Dicas para padrões de prompt de Large Language Models (LLM). Disponível em: <https://www.redhat.com/pt-br/blog/tips-for-gen-ai-prompts>. Acesso em: 08 jan. 2026.
+
+Li, J. et al. 2024. Can LLM already serve as a database interface? A big bench for large-scale database grounded text-to-SQLs. Advances in Neural Information Processing Systems (36): 1-28.
