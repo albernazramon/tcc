@@ -16,7 +16,6 @@ interface OptimizeResponse {
 export default function Home() {
   const [query, setQuery] = useState('');
   const [schema, setSchema] = useState('');
-  const [additionalInfo, setAdditionalInfo] = useState('');
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [result, setResult] = useState<OptimizeResponse | null>(null);
   const { toast } = useToast();
@@ -36,7 +35,7 @@ export default function Home() {
         body: JSON.stringify({
           query,
           schema,
-          additional_info: additionalInfo,
+          additional_info: '',
         }),
       });
 
@@ -108,21 +107,6 @@ export default function Home() {
                 }
                 placeholder='CREATE TABLE users (id INT, name VARCHAR(50));...'
                 className='h-full w-full p-4 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none font-mono'
-              />
-            </div>
-
-            <div className='flex flex-col'>
-              <label className='block text-base font-semibold text-gray-700 mb-2 flex items-center gap-2'>
-                <Lightbulb className='w-5 h-5 text-blue-500' /> Informações
-                Adicionais (Opcional)
-              </label>
-              <Textarea
-                value={additionalInfo}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setAdditionalInfo(e.target.value)
-                }
-                placeholder='Qualquer contexto extra, índice existente ou objetivo específico...'
-                className='h-24 w-full p-4 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none font-sans'
               />
             </div>
 
